@@ -25,8 +25,15 @@ from .models import db
 
 # Third, setup baseframe and assets
 
-assets['hgapp.js'][version] = 'js/app.js'
-assets['hgapp.css'][version] = 'css/app.css'
+
+assets['agency.js'][version] = 'js/app.js'
+assets['classie.js'][version] = 'js/classie.js'
+assets['cbpAnimatedHeader.js'][version] = 'js/cbpAnimatedHeader.js'
+assets['jqBootstrapValidation.js'][version] = 'js/jqBootstrapValidation.js'
+assets['contact_me.js'][version] = 'js/contact_me.js'
+
+assets['app.js'][version] = {'requires': ['agency.js', 'classie.js', 'cbpAnimatedHeader.js', 'jqBootstrapValidation.js', 'contact_me.js']}
+assets['app.css'][version] = 'css/app.css'
 
 
 # Configure the app
@@ -34,6 +41,6 @@ def init_for(env):
     coaster.app.init_app(app, env)
     db.init_app(app)
     db.app = app
-    baseframe.init_app(app, requires=['baseframe-bs3', 'hgapp'])
+    baseframe.init_app(app, requires=['baseframe-bs3', 'app'])
     lastuser.init_app(app)
     lastuser.init_usermanager(UserManager(db, outreach.models.User, outreach.models.Team))
