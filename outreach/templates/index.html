@@ -5,9 +5,74 @@
 {%- endblock %}
 
 {% block content %}
+  <div class="hero-unit clean">
+    <h1>Welcome, how may we help you?</h1>
+    <p>
+      HasGeek helps geeks — developers and designers — discover new opportunities,
+      refine their skills, and engage with new ideas via our many events
+      and online forums. We can help your company engage with them as well.
+    </p>
+    {%- if not g.user %}
+      <p>
+        To learn about the opportunities we offer, please login.
+      </p>
+      <p>
+        <a class="btn btn-primary btn-large" href="{{ url_for('login') }}">Login or sign up</a>
+      </p>
+    {%- else %}
+      <p>
+        You do not have any ongoing campaigns. To start, please select how you’d like to proceed.
+      </p>
+      <p>
+        <a href="" class="btn btn-primary btn-large">I have a goal in mind</a>
+        <a href="" class="btn btn-primary btn-large">I’d like to explore available opportunities</a>
+      </p>
+    {%- endif %}
+  </div>
+  {%- if g.user %}
 
-<p>
-  Insert content here.
-</p>
-
+    <div class="row">
+      <div class="span4">
+        <h2 class="htile">I have a goal in mind</h2>
+        <ul class="nav nav-pills nav-stacked">
+          <li><a href="">Recruit for a specific position</a></li>
+          <li><a href="">Recruit by candidate profile</a></li>
+          <li><a href="">Get training for my staff</a></li>
+          <li><a href="">Improve awareness of my brand</a></li>
+          <li><a href="">Drive downloads or usage of my SDK or API</a></li>
+        </ul>
+      </div>
+      <div class="span8">
+        <h2 class="htile">I’d like to explore available opportunities</h2>
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#explore-conferences" data-toggle="tab">Conferences</a></li>
+          <li><a href="#explore-workshops" data-toggle="tab">Workshops</a></li>
+          <li><a href="#explore-hacknights" data-toggle="tab">Hacknights</a></li>
+          <li><a href="#explore-geekups" data-toggle="tab">Geekups</a></li>
+          <li><a href="#explore-online" data-toggle="tab">Online</a></li>
+        </ul>
+        <div class="tab-content">
+          <ul class="tab-pane active cardset row" id="explore-conferences">
+            {% for event in ['Meta Refresh 2013', 'The Fifth Elephant 2013', 'HasGeek Job Board', 'JSFoo 2013', 'Droidcon India 2013'] %}
+            <li class="span4">
+              <a href="">
+                <div class="card-title">
+                  <h2>{{ event }}</h2>
+                  <h3>Feb 22-23, Bangalore</h3>
+                </div>
+                <div class="card-body">
+                  Meta Refresh is a frontend conference.
+                </div>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          <ul class="tab-pane cardset row" id="explore-workshops"></ul>
+          <ul class="tab-pane cardset row" id="explore-hacknights"></ul>
+          <ul class="tab-pane cardset row" id="explore-geekups"></ul>
+          <ul class="tab-pane cardset row" id="explore-online"></ul>
+        </div>
+      </div>
+    </div>
+  {%- endif %}
 {% endblock %}

@@ -9,7 +9,7 @@ from outreach import app, lastuser
 @app.route('/login')
 @lastuser.login_handler
 def login():
-    return {'scope': 'id'}
+    return {'scope': 'id email organizations'}
 
 
 @app.route('/logout')

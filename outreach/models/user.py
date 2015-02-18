@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from flask.ext.lastuser.sqlalchemy import UserBase
+from flask.ext.lastuser.sqlalchemy import UserBase, TeamBase
 from outreach.models import db
 
-__all__ = ['User']
+__all__ = ['User', 'Team']
 
 
 class User(UserBase, db.Model):
-    __tablename__ = 'user'
+    pass
+
+
+class Team(TeamBase, db.Model):
+    pass

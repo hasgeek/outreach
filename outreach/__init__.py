@@ -35,4 +35,4 @@ assets.register('css_all', css)
 def init_for(env):
     coaster.app.init_app(app, env)
     lastuser.init_app(app)
-    lastuser.init_usermanager(UserManager(db, outreach.models.User))
+    lastuser.init_usermanager(UserManager(db, outreach.models.User, outreach.models.Team))
