@@ -13,11 +13,24 @@ $(function() {
         }, 1500, 'easeInOutExpo');
         event.preventDefault();
     });
+    var header = document.querySelector( '.st-navbar-default' );
+    $(window).scroll(function(){
+        if(scrollY>=0 && scrollY<=30) {
+            $('.st-navbar-default').animate({
+                marginTop: 30-scrollY+'px'
+            },0, function(){})
+        }
+        else if(scrollY>30) {
+            $('.st-navbar-default').animate({
+                marginTop: '0px'
+            },0, function(){})
+        }
+    });
 });
 
 // Highlight the top nav as scrolling occurs
 $('body').scrollspy({
-    target: '.navbar-fixed-top'
+    target: '.st-navbar-fixed-top'
 })
 
 // Closes the Responsive Menu on Menu Item Click

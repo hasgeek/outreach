@@ -3,7 +3,7 @@
 {% block headerbox %}
 {% block networkbar %}{{ responsive_networkbar(siteid='auth', login=true) }}{% endblock %}
 {% endblock %}
-{% block basecontent -%}
+{% block main -%}
 
         <!-- Navigation -->
     <nav class="navbar navbar-default navbar-fixed-top st-navbar st-navbar-default st-navbar-fixed-top">
@@ -16,7 +16,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand st-navbar-brand page-scroll" href="#page-top">Start Bootstrap</a>
+                <div id="logo"><a href="{{ request.script_root or '/' }}" title="Home">{{ config['SITE_TITLE'] }}</a></div>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
