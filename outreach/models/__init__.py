@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from flask.ext.sqlalchemy import SQLAlchemy
-from outreach import app
-from coaster.sqlalchemy import IdMixin, TimestampMixin, BaseMixin, BaseNameMixin
+from coaster.sqlalchemy import BaseMixin, BaseNameMixin, BaseScopedNameMixin, BaseScopedIdNameMixin, BaseScopedIdMixin, IdMixin, JsonDict, MarkdownColumn
 
-db = SQLAlchemy(app)
+from coaster.db import db
 
-from outreach.models.user import *
+from .user import *
+from .item_collection import *
+from .category import *
+from .item import *
+from .discount_policy import *
+from .order import *
+from .line_item import *
+from .payment import *
