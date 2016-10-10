@@ -119,7 +119,7 @@ $(function() {
           return boxoffice.config.baseURL + '/order/kharcha';
         }
       },
-      purchaseOrder: {
+      createOrder: {
         method: 'POST',
         urlFor: function(){
           return boxoffice.config.baseURL + '/ic/' + config.ic + '/order';
@@ -273,18 +273,22 @@ $(function() {
         },
         openCart: function(event, action) {
           event.original.preventDefault();
-          boxoffice.ractive.scrollTop();
           boxoffice.ractive.set('cartSideBarOpen', action);
-        },
-        closeCart: function(event, action) {
-          event.original.preventDefault();
-          boxoffice.ractive.set('cartSideBarOpen', action);
+          if(action) {
+            var body = document.getElementsByTagName("body")[0];
+            body.style.overflow = "hidden";
+          }
+          else {
+            var body = document.getElementsByTagName("body")[0];
+            body.style.overflow = "";
+          }
         },
         selectItems: function(event) {
           // Makes the 'Select Items' tab active
           event.original.preventDefault();
           boxoffice.ractive.calculateOrder();
           boxoffice.ractive.fire('eventAnalytics', 'edit order', 'Edit order');
+          boxoffice.ractive.set('cartSideBarOpen', false);
           boxoffice.ractive.set('activeTab', boxoffice.ractive.get('tabs.selectItems.id'));
           boxoffice.ractive.scrollTop();
         },
@@ -477,17 +481,21 @@ $(function() {
             });
           }
         },
-        getContactDetails: function() {
+        getContactDetails: function(event) {
+          // Transitions the widget to the Contact Details form
+          event.original.preventDefault();
+          boxoffice.ractive.openCart(event, false);
           boxoffice.ractive.set({
             'tabs.payment.errorMsg': '',
             'order.status': boxoffice.orderStatus.Enquiry,
             'activeTab': boxoffice.ractive.get('tabs.payment.id')
           });
+          boxoffice.ractive.scrollTop();
         },
         continue: function(event) {
-          // Transitions the widget to the 'Payment' stage, and initializes
-          // the validator.
+          // Transitions the widget to the Buyer form
           event.original.preventDefault();
+          boxoffice.ractive.openCart(event, false);
           boxoffice.ractive.fire('eventAnalytics', 'checkout', 'Checkout');
           boxoffice.ractive.set({
             'tabs.payment.errorMsg': '',
@@ -498,7 +506,6 @@ $(function() {
           boxoffice.ractive.scrollTop();
         },
         checkout: function(event, proceed_to_payment) {
-          boxoffice.ractive.set('tabs.payment.loadingOrder', true);
           var validationConfig = [{
             name: 'name',
             rules: 'required'
@@ -518,8 +525,8 @@ $(function() {
             if (errors.length > 0) {
               boxoffice.ractive.set('tabs.payment.errormsg.' + errors[0].name, errors[0].message);
               boxoffice.ractive.scrollTop();
-              boxoffice.ractive.set('tabs.payment.sendingDetails', false);
             } else {
+              boxoffice.ractive.set('tabs.payment.loadingOrder', true);
               boxoffice.ractive.createOrder(proceed_to_payment);
             }
           });
@@ -552,14 +559,13 @@ $(function() {
           });
         },
         createOrder: function(proceed_to_payment) {
-          boxoffice.ractive.fire('eventAnalytics', 'order creation', 'sendOrder');
-          $.post({
-            url: boxoffice.config.resources.purchaseOrder.urlFor(),
-            crossDomain: true,
-            dataType: 'json',
-            headers: {'X-Requested-With': 'XMLHttpRequest'},
-            contentType: 'application/json',
-            data: JSON.stringify({
+          boxoffice.ractive.fire('eventAnalytics', 'order creation', 'createOrder');
+          var create_order_url;
+          var items;
+          //TODO: Different endpoint for proforma invoice and contact details.
+          if (proceed_to_payment) {
+            create_order_url = boxoffice.config.resources.createOrder.urlFor();
+            items = JSON.stringify({
               buyer:{
                 email: boxoffice.ractive.get('buyer.email'),
                 fullname: boxoffice.ractive.get('buyer.name'),
@@ -575,7 +581,19 @@ $(function() {
               }),
               order_session: boxoffice.util.getUtmHeaders(),
               discount_coupons: boxoffice.util.getDiscountCodes()
-            }),
+            });
+          }
+          else {
+            create_order_url = boxoffice.config.resources.createOrder.urlFor();
+            items = "";
+          }
+          $.post({
+            url: create_order_url,
+            crossDomain: true,
+            dataType: 'json',
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            contentType: 'application/json',
+            data: items,
             timeout: 5000,
             retries: 5,
             retryInterval: 5000,
@@ -597,7 +615,7 @@ $(function() {
                 boxoffice.ractive.scrollTop();
               }
               else {
-                boxoffice.ractive.confirmPurchaseOrder();
+                boxoffice.ractive.confirmContactDetails();
               }
             },
             error: function(response) {
@@ -627,7 +645,8 @@ $(function() {
             }
           });
         },
-        confirmPurchaseOrder: function() {
+        confirmContactDetails: function() {
+          boxoffice.ractive.scrollTop();
           boxoffice.ractive.set({
             'tabs.payment.errorMsg': '',
             'activeTab': boxoffice.ractive.get('tabs.confirm.id')

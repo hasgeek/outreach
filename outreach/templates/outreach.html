@@ -1,9 +1,6 @@
 {%raw%}
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<button class="cart-btn {{#if order.readyToCheckout}}items-present{{/if}}" on-click="openCart(event, true)">
-  <i class="fa fa-cart-plus"></i>
-</button>
 <div class="payment-progress-wrapper payment-stages-bg" id="payment-stages">
   <ul class="progress-indicator">
     {{#tabs:tab}}
@@ -16,7 +13,10 @@
 <div class="payment-stages-wrapper">
   {{#tabs:tab}}
     {{#if id === 'boxoffice-selectItems' && id === activeTab}}
-      <div id='{{id}}' class="boxoffice-section ticket-selection-content clearfix" intro-outro='fly:{"x":0,"y":"0"}'>        
+      <div id='{{id}}' class="boxoffice-section ticket-selection-content clearfix" intro-outro='fly:{"x":0,"y":"0"}'>
+        <button class="cart-btn {{#if order.readyToCheckout}}items-present{{/if}}" on-click="openCart(event, true)">
+          <i class="fa fa-shopping-cart"></i>
+        </button>
         {{#section.categories}}
           <div id="{{name}}" class="categories">
             <div>
@@ -91,17 +91,18 @@
             </div>
           </div>
         {{/section.categories}}
+
         <div class="cart-content {{#cartSideBarOpen}}cart-open{{/}}" on-click="openCart(event, false)">
-          <div class="cart-details clearfix">
+          <div class="cart-body clearfix">
             <p class="cart-title">
+              <button class="close-button" on-click="openCart(event, false)"><i class="fa fa-angle-double-right"></i></button>
               <span>Cart</span>
-              <button class="close-button" on-click="openCart(event, false)"><i class="fa fa-chevron-circle-right"></i></button>
             </p>
-            <div class="cart-body">
+            <ol class="cart-list">
               {{#order.line_items}} {{# { line_item: . } }}
                 {{#if line_item.quantity > 0 }}
-                  <div class="item-summary">
-                    <p class="booked-ticket-title"><i class="fa fa-ticket"></i>{{ line_item.item_title }}</p>
+                  <li class="item-summary">
+                    <span class="booked-ticket-title">{{ line_item.item_title }}</span>
                     <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
                     {{#line_item.discounted_amount}}
                       <p class="booked-ticket-qty">Discount {{ formatToIndianRupee(line_item.discounted_amount) }}</p>
@@ -112,33 +113,42 @@
                       {{/if}}
                     {{/line_item.discount_policies}}
                     <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
-                  </div>
+                  </li>
                 {{/if}}
               {{/}}{{/order.line_items}}
+            </ol>
+            {{#errorMsg }}
+              <p class="stage-error-msg">{{ errorMsg }}</p>
+            {{/}}
+          </div>
+          <div class="cart-footer">
+            <div class="ticket-total {{#loadingPrice}}grey-out{{/}}">
+              {{#loadingPrice && !isLoadingFail}}
+                <div class="loader"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+              {{/}}
+              <p class="price">Total <span class="final-amount">{{ formatToIndianRupee(order.final_amount) }}</span></p>
             </div>
-            <div class="cart-footer">
-              <div class="ticket-total {{#loadingPrice}}grey-out{{/}}">
-                {{#loadingPrice && !isLoadingFail}}
-                  <div class="loader"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
-                {{/}}
-                <p class="price">Total <span class="final-amount">{{ formatToIndianRupee(order.final_amount) }}</span></p>
-              </div>
-              <button class="boxoffice-button boxoffice-button-info cart-footer-btn" on-click="getContactDetails(event)">Talk to us</button>
-              {{#order.readyToCheckout}}
-                  <button id="stage1-proceed" class="boxoffice-button boxoffice-button-action cart-footer-btn" on-click="continue(event)">Proceed to checkout</button>
-              {{/order.readyToCheckout}}
-            </div>
+            <button class="boxoffice-button boxoffice-button-info cart-footer-btn" on-click="getContactDetails(event)">Contact sales</button>
+            {{#order.readyToCheckout}}
+                <button id="stage1-proceed" class="boxoffice-button boxoffice-button-action cart-footer-btn" on-click="continue(event)">Proceed to checkout</button>
+            {{/order.readyToCheckout}}
           </div>
         </div>
-        {{#errorMsg }}
-          <p class="stage-error-msg">{{ errorMsg }}</p>
-        {{/}}
+
+        <div class="proceed-button-wrapper">
+          <button class="boxoffice-button boxoffice-button-info" on-click="getContactDetails(event)"><i class="fa fa-phone"></i> Talk to us</button>
+          {{#order.readyToCheckout}}
+              <button id="stage1-proceed" class="boxoffice-button boxoffice-button-action" on-click="continue(event)">Proceed to checkout</button>
+          {{/order.readyToCheckout}}
+        </div>
+
         {{#refund_policy}}
-          <hr class="separator">
           <div class="policy">
+            <hr class="separator">
             {{{refund_policy}}}
           </div>
         {{/}}
+
       </div>
     {{elseif id === 'boxoffice-payment' && id === activeTab}}
       {{#loadingPaymentConfirmation}}
@@ -170,36 +180,40 @@
             {{#errormsg.phone}}<p class="form-error-msg">{{ errormsg.phone }}</p>{{/}}
           </div>
           <div class="checkout-confirmation">
-            <p class="summary">Booking Summary</p>
-            {{#order.line_items}} {{# { line_item: . } }}
-              {{#if line_item.quantity > 0 }}
-                <div class="item-summary">
-                  <p class="booked-ticket-title"><i class="fa fa-ticket"></i>{{ line_item.item_title }}</p>
-                  <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
-                  {{#line_item.discounted_amount}}
-                    <p class="booked-ticket-qty">Discount {{ formatToIndianRupee(line_item.discounted_amount) }}</p>
-                  {{/line_item.discounted_amount}}
-                  {{#line_item.discount_policies}}
-                    {{#if activated}}
-                    <p class="discount-applied">Applied {{ title }}</p>
-                    {{/if}}
-                  {{/line_item.discount_policies}}
-                  <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
-                </div>
-              {{/if}}
-            {{/}}{{/order.line_items}}
-            <p class="price">Amount Payable <span class="final-amount"><b> {{ formatToIndianRupee(order.final_amount) }}</b></span></p>
+            {{#if order.status != 0}}
+              <p class="summary">Booking Summary</p>
+              {{#order.line_items}} {{# { line_item: . } }}
+                {{#if line_item.quantity > 0 }}
+                  <div class="item-summary">
+                    <p class="booked-ticket-title"><i class="fa fa-ticket"></i>{{ line_item.item_title }}</p>
+                    <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
+                    {{#line_item.discounted_amount}}
+                      <p class="booked-ticket-qty">Discount {{ formatToIndianRupee(line_item.discounted_amount) }}</p>
+                    {{/line_item.discounted_amount}}
+                    {{#line_item.discount_policies}}
+                      {{#if activated}}
+                      <p class="discount-applied">Applied {{ title }}</p>
+                      {{/if}}
+                    {{/line_item.discount_policies}}
+                    <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
+                  </div>
+                {{/if}}
+              {{/}}{{/order.line_items}}
+              <p class="price">Amount Payable <span class="final-amount"><b> {{ formatToIndianRupee(order.final_amount) }}</b></span></p>
+              <hr class="separator">
+            {{/if}}
           </div>
           <div class="proceed-button-wrapper">
-            <button class="boxoffice-button boxoffice-button-info edit-order" type="button" on-click="selectItems(event)">Edit order</button>
             {{#if order.status == 0}}
+              <button class="boxoffice-button boxoffice-button-info edit-order" type="button" on-click="selectItems(event)">Back</button>
               <button type="submit" class="boxoffice-button boxoffice-button-action" {{#loadingOrder}}disabled{{/}} on-click="checkout(event, false)">
               Submit {{#loadingOrder}}<i class="fa fa-spinner fa-spin" intro='fly:{"x":0,"y":"0"}'>{{/}}
               </button>
             {{else}}
-            <button type="submit" class="boxoffice-button boxoffice-button-action" {{#loadingOrder}}disabled{{/}} on-click="checkout(event, true)">
-              Checkout {{#loadingOrder}}<i class="fa fa-spinner fa-spin" intro='fly:{"x":0,"y":"0"}'>{{/}}
-            </button>
+              <button class="boxoffice-button boxoffice-button-info edit-order" type="button" on-click="selectItems(event)">Edit order</button>
+              <button type="submit" class="boxoffice-button boxoffice-button-action" {{#loadingOrder}}disabled{{/}} on-click="checkout(event, true)">
+                Checkout {{#loadingOrder}}<i class="fa fa-spinner fa-spin" intro='fly:{"x":0,"y":"0"}'>{{/}}
+              </button>
             {{/if}}
           </div>
           {{#errorMsg}}
@@ -214,21 +228,25 @@
             <p class="confirmation-icon"><i class="fa fa-check-circle"></i></p>
             <p class="confirmation-header">Thank you for your order!</p>
             <div class="confirmation-msg">
-              <p class="">We’ve mailed you the cash receipt.</p>
+              <p>We’ve mailed you the cash receipt.</p>
               <div class="receipt-btn-wrapper">
                 <a href="{{ cashReceiptURL }}" target="_blank" class="boxoffice-button boxoffice-button-action receipt-button" on-click="fire('eventAnalytics','view cash receipt', 'cash receipt')">See cash receipt</a>
               </div>
             </div>
           {{/section}}
         {{else}}
-          <p class="confirmation-header">Thank you for your interest.</p>
-          <p class="confirmation-header">We will get in touch with you in sometime.</p>
+          <p class="confirmation-icon"><i class="fa fa-thumbs-up"></i></p>
+          <p class="confirmation-header">Thank you for your interest!</p>
+          <div class="confirmation-msg">
+            <p>We will contact you within the next 24 hours by phone or email.</p>
+          </div>
         {{/if}}
       </div>      
     {{/if}}
   {{/}}
 </div>
 {%endraw%}
+
 <style>
   #boxoffice-widget {
     max-width: 1170px;
@@ -243,6 +261,7 @@
     color: #fff;
     font-size: 15px;
     display: inline-block;
+    margin: 5px;
   }
   .boxoffice-button-action {
     background-color: #5CB85C;
@@ -635,25 +654,23 @@
     border-top: 1px solid #eee;
   }
   .cart-btn {
-    border: 0;
-    box-shadow: none;
     position: fixed;
     bottom: 10px;
     right: 25px;
-    font-size: 40px;
-    background-color: transparent;
+    font-size: 35px;
     color: #fff;
     background-color: #856A91;
     border-radius: 5px;
     z-index: 998;
     border-color: #2f2433;
-    border-width: 0 0 3px;
+    border-width: 0 0 5px;
     border-style: solid;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
+    padding-right: 9px;
   }
   @media (min-width: 1024px) {
     .cart-btn {
-      right: 16%;
+      right: 12%;
     }
   }
   .cart-btn.items-present {
@@ -678,10 +695,10 @@
   .cart-content {
     width: 100%;
     background-color: rgba(0, 0, 0, 0.3);
-    position: absolute;
-    z-index: 999;
+    position: fixed;
+    z-index: 1030;
     top: 0;
-    bottom: 0px;
+    bottom: 0;
     right: -100%;
     transition: 0.2s ease all;
     -moz-transition: 0.2s ease all;
@@ -690,7 +707,7 @@
   .cart-open {
     right: 0;
   }
-  .cart-details {
+  .cart-body {
     position: absolute;
     top: 0px;
     right: 0px;
@@ -698,29 +715,38 @@
     padding: 15px;
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.6);
     bottom: 0px;
-    background-color: rgb(238, 238, 238);
+    background-color: #eee;
     border: 2px solid #ccc;
-    border-width: 0px 2px 2px 0px;
+    border-width: 0 0 2px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 75%;
+  }
+  .cart-body .cart-list {
+    padding: 0;
   }
   .close-button {
     border: 0;
     box-shadow: none;
-    position: absolute;
-    right: 15px;
-    font-size: 20px;
-    top: 21px;
+    margin-right: 5px;
+    font-size: 25px;
+    padding: 0;
+    position: relative;
+    top: -2px;
   }
   .cart-title {
     font-size: 30px;
-    padding: 15px;
-    margin: -15px -15px 15px;
-    text-align: center;
+    text-align: left;
     line-height: 1;
   }
   .cart-footer {
-    border-top: 2px solid #fff;
-    position: relative;
-    top: 10%;
+    padding: 0 15px;
+    width: 250px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #eee;
+    height: 25%;
   }
   .cart-footer-btn {
     width: 100%;
@@ -902,8 +928,8 @@
     font-size: 13px;
   }
   .proceed-button-wrapper {
+    margin: 10px 0;
     clear: both;
-    margin: 15px 0 10px;
     float: right;
   }
   .edit-order {
@@ -961,19 +987,5 @@
     color: inherit;
     border-color: inherit;
     border-bottom: 3px solid;
-  }
-  .receipt-btn-wrapper, .social-icons {
-    text-align: center;
-  }
-  .fb-share-button {
-    display: inline-block;
-    line-height: 1;
-    padding: 0px 0px 0px 10px !important;
-    top: -2px;
-  }
-  .tweet-button {
-    line-height: 1;
-    position: relative;
-    top: 2px;
   }
 </style>
