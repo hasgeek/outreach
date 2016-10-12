@@ -40,6 +40,14 @@ class ItemModelView(SiteAdminModelView):
     form_excluded_columns = ['parent', 'line_items', 'created_at', 'updated_at']
 
 
+class ItemImageView(SiteAdminModelView):
+    can_delete = False
+    column_display_pk = True
+    column_filters = ['item']
+    column_list = ('item', 'url')
+    form_excluded_columns = ['parent', 'primary', 'created_at', 'updated_at']
+
+
 class PriceModelView(SiteAdminModelView):
     can_delete = False
     column_display_pk = True

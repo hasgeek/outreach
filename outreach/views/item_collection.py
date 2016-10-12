@@ -14,6 +14,7 @@ def jsonify_item(item):
             'name': item.name,
             'title': item.title,
             'id': item.id,
+            'image': item.images[0].url,
             'description': item.description.text,
             'quantity_available': item.quantity_available,
             'is_available': item.is_available,

@@ -8,7 +8,7 @@ from ..models import db, BaseScopedNameMixin, MarkdownColumn
 from ..models import ItemCollection, Category
 from ..models.discount_policy import item_discount_policy
 
-__all__ = ['Item', 'Price']
+__all__ = ['Item', 'ItemImage', 'Price']
 
 
 class Item(BaseScopedNameMixin, db.Model):

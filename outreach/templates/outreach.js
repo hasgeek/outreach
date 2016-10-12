@@ -125,6 +125,12 @@ $(function() {
           return boxoffice.config.baseURL + '/ic/' + config.ic + '/order';
         }
       },
+      inquiry: {
+        method: 'POST',
+        urlFor: function(){
+          return boxoffice.config.baseURL + '/ic/' + config.ic + '/inquiry';
+        }
+      },
       payment: {
         method: 'POST',
         urlFor: function(id){
@@ -151,7 +157,7 @@ $(function() {
   };
 
   boxoffice.orderStatus = {
-    'Enquiry': 0,
+    'Inquiry': 0,
     'PurchaseOrder': 1,
     'SalesOrder': 2
   }
@@ -168,9 +174,6 @@ $(function() {
       crossDomain: true,
       headers: {'X-Requested-With': 'XMLHttpRequest'},
       dataType: 'json',
-      data: {
-        type: 'outreach'
-      }
     }).done(function(data) {
       var lineItems = [];
 
@@ -187,6 +190,7 @@ $(function() {
             'unit_final_amount': undefined,
             'discounted_amount': undefined,
             'final_amount': undefined,
+            'item_image': item.image,
             'item_description': item.description,
             'price_valid_upto': boxoffice.util.formatDate(item.price_valid_upto),
             'discount_policies': item.discount_policies,
@@ -494,7 +498,7 @@ $(function() {
           boxoffice.ractive.openCart(event, false);
           boxoffice.ractive.set({
             'tabs.payment.errorMsg': '',
-            'order.status': boxoffice.orderStatus.Enquiry,
+            'order.status': boxoffice.orderStatus.Inquiry,
             'activeTab': boxoffice.ractive.get('tabs.payment.id')
           });
           boxoffice.ractive.scrollTop();
@@ -569,10 +573,17 @@ $(function() {
           boxoffice.ractive.fire('eventAnalytics', 'order creation', 'createOrder');
           var create_order_url;
           var items;
-          //TODO: Different endpoint for proforma invoice and contact details.
           if (proceed_to_payment) {
             create_order_url = boxoffice.config.resources.createOrder.urlFor();
-            items = JSON.stringify({
+          }
+          else {
+            create_order_url = boxoffice.config.resources.inquiry.urlFor();
+          }
+          $.post({
+            url: create_order_url,
+            crossDomain: true,
+            dataType: 'json',
+            data: JSON.stringify({
               buyer:{
                 email: boxoffice.ractive.get('buyer.email'),
                 fullname: boxoffice.ractive.get('buyer.name'),
@@ -588,16 +599,7 @@ $(function() {
               }),
               order_session: boxoffice.util.getUtmHeaders(),
               discount_coupons: boxoffice.util.getDiscountCodes()
-            });
-          }
-          else {
-            create_order_url = boxoffice.config.resources.createOrder.urlFor();
-            items = "";
-          }
-          $.post({
-            url: create_order_url,
-            crossDomain: true,
-            dataType: 'json',
+            }),
             headers: {'X-Requested-With': 'XMLHttpRequest'},
             contentType: 'application/json',
             data: items,

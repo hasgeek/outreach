@@ -38,9 +38,11 @@
                           <p class="valid-upto"><i class="fa fa-fw fa-long-arrow-up"></i>Price goes up after {{line_item.price_valid_upto}}</p>
                         {{/if}}
                       </div>
+                      {{#line_item.item_image}}
                       <div class="ticket-image">
-                        <img src="https://images.hasgeek.com/embed/file/7557d4600b2a4f62bd333804947558d6">
+                        <img src="{{line_item.item_image}}">
                       </div>
+                      {{/}}
                       <div class="ticket-description">{{{ line_item.item_description }}}</div>
                       {{#line_item.discount_policies}}
                         {{#if is_automatic || activated || pre_applied }}
