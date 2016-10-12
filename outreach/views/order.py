@@ -11,6 +11,7 @@ from ..models import db, LineItem, Item, ItemCollection, User, Order, DiscountPo
 from ..forms import LineItemForm, BuyerForm, OrderSessionForm
 from ..extapi import razorpay
 from outreach.mailclient import send_receipt_mail
+from custom_exceptions import PaymentGatewayError
 
 
 def jsonify_line_items(line_items):
