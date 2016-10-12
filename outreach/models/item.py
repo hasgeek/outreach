@@ -64,6 +64,27 @@ class Item(BaseScopedNameMixin, db.Model):
         return bool(self.current_price() and self.quantity_available > 0)
 
 
+class ItemImage(BaseScopedNameMixin, db.Model):
+    """
+    Represents a single image in an item's image collection.
+    The image collection can contain exactly one primary image
+    """
+
+    __tablename__ = 'item_image'
+    __uuid_primary_key__ = True
+    __table_args__ = (db.UniqueConstraint('item_id', 'name'),
+        db.UniqueConstraint('item_id', 'primary'))
+
+    url = db.Column(db.Unicode(2083), nullable=False)
+    item_id = db.Column(None, db.ForeignKey('item.id'), nullable=False)
+    item = db.relationship(Item, backref=db.backref('images', cascade='all, delete-orphan'))
+    parent = db.synonym('item')
+    primary = db.Column(db.Boolean, nullable=True, default=False)
+
+    def set_as_primary(self):
+        self.primary = True
+
+
 class Price(BaseScopedNameMixin, db.Model):
     __tablename__ = 'price'
     __uuid_primary_key__ = True
