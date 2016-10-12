@@ -443,7 +443,14 @@ $(function() {
                     'order.final_amount': data.order.final_amount,
                     'tabs.selectItems.errorMsg': ''
                   });
+
+                  //Currently online transaction limit is 5 lakhs, so disable checkout option
+                  if(data.order.final_amount > 500000) {
+                    readyToCheckout = false;
+                    boxoffice.ractive.set('tabs.selectItems.errorMsg', "Orders for above Rs 5 lakh cannot be processed online. Please contact us to complete your order");
+                  }
                 }
+
                 boxoffice.ractive.set({
                   'tabs.selectItems.loadingPrice': false,
                   'order.readyToCheckout': readyToCheckout

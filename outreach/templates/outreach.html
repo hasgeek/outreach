@@ -128,18 +128,38 @@
               {{/}}
               <p class="price">Total <span class="final-amount">{{ formatToIndianRupee(order.final_amount) }}</span></p>
             </div>
-            <button class="boxoffice-button boxoffice-button-info cart-footer-btn" on-click="getContactDetails(event)">Contact sales</button>
+            <button class="boxoffice-button boxoffice-button-info cart-footer-btn" on-click="getContactDetails(event)">
+              <i class="fa fa-phone"></i> Talk to us
+            </button>
             {{#order.readyToCheckout}}
-                <button id="stage1-proceed" class="boxoffice-button boxoffice-button-action cart-footer-btn" on-click="continue(event)">Proceed to checkout</button>
+                <button id="stage1-proceed" class="boxoffice-button boxoffice-button-action cart-footer-btn" on-click="continue(event)" {{#loadingPrice && !isLoadingFail}}disabled{{/}}>
+                  Proceed to checkout
+                  {{#loadingPrice && !isLoadingFail}}
+                    <i class="fa fa-spinner fa-spin"></i>
+                  {{/}}
+                </button>
             {{/order.readyToCheckout}}
           </div>
         </div>
 
         <div class="proceed-button-wrapper">
-          <button class="boxoffice-button boxoffice-button-info" on-click="getContactDetails(event)"><i class="fa fa-phone"></i> Talk to us</button>
+          <button class="boxoffice-button boxoffice-button-info" on-click="getContactDetails(event)">
+            <i class="fa fa-phone"></i> Talk to us
+          </button>
           {{#order.readyToCheckout}}
-              <button id="stage1-proceed" class="boxoffice-button boxoffice-button-action" on-click="continue(event)">Proceed to checkout</button>
+            <button id="stage1-proceed" class="boxoffice-button boxoffice-button-action" on-click="continue(event)" {{#loadingPrice && !isLoadingFail}}disabled{{/}}>
+              Proceed to checkout
+              {{#loadingPrice && !isLoadingFail}}
+                <i class="fa fa-spinner fa-spin"></i>
+              {{/}}
+            </button>
           {{/order.readyToCheckout}}
+        </div>
+
+        <div>
+          {{#errorMsg }}
+            <p class="stage-error-msg">{{ errorMsg }}</p>
+          {{/}}
         </div>
 
         {{#refund_policy}}
@@ -180,28 +200,26 @@
             {{#errormsg.phone}}<p class="form-error-msg">{{ errormsg.phone }}</p>{{/}}
           </div>
           <div class="checkout-confirmation">
-            {{#if order.status != 0}}
-              <p class="summary">Booking Summary</p>
-              {{#order.line_items}} {{# { line_item: . } }}
-                {{#if line_item.quantity > 0 }}
-                  <div class="item-summary">
-                    <p class="booked-ticket-title"><i class="fa fa-ticket"></i>{{ line_item.item_title }}</p>
-                    <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
-                    {{#line_item.discounted_amount}}
-                      <p class="booked-ticket-qty">Discount {{ formatToIndianRupee(line_item.discounted_amount) }}</p>
-                    {{/line_item.discounted_amount}}
-                    {{#line_item.discount_policies}}
-                      {{#if activated}}
-                      <p class="discount-applied">Applied {{ title }}</p>
-                      {{/if}}
-                    {{/line_item.discount_policies}}
-                    <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
-                  </div>
-                {{/if}}
-              {{/}}{{/order.line_items}}
-              <p class="price">Amount Payable <span class="final-amount"><b> {{ formatToIndianRupee(order.final_amount) }}</b></span></p>
-              <hr class="separator">
-            {{/if}}
+            <p class="summary">Booking Summary</p>
+            {{#order.line_items}} {{# { line_item: . } }}
+              {{#if line_item.quantity > 0 }}
+                <div class="item-summary">
+                  <p class="booked-ticket-title"><i class="fa fa-ticket"></i>{{ line_item.item_title }}</p>
+                  <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
+                  {{#line_item.discounted_amount}}
+                    <p class="booked-ticket-qty">Discount {{ formatToIndianRupee(line_item.discounted_amount) }}</p>
+                  {{/line_item.discounted_amount}}
+                  {{#line_item.discount_policies}}
+                    {{#if activated}}
+                    <p class="discount-applied">Applied {{ title }}</p>
+                    {{/if}}
+                  {{/line_item.discount_policies}}
+                  <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
+                </div>
+              {{/if}}
+            {{/}}{{/order.line_items}}
+            <p class="price">Amount Payable <span class="final-amount"><b> {{ formatToIndianRupee(order.final_amount) }}</b></span></p>
+            <hr class="separator">
           </div>
           <div class="proceed-button-wrapper">
             {{#if order.status == 0}}
