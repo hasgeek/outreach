@@ -76,7 +76,7 @@ class ItemImage(BaseScopedNameMixin, db.Model):
         db.UniqueConstraint('item_id', 'primary'))
 
     url = db.Column(db.Unicode(2083), nullable=False)
-    item_id = db.Column(None, db.ForeignKey('item.id'), nullable=False)
+    item_id = db.Column(None, db.ForeignKey('item.id'), nullable=False, index=True)
     item = db.relationship(Item, backref=db.backref('images', cascade='all, delete-orphan'))
     parent = db.synonym('item')
     primary = db.Column(db.Boolean, nullable=True, default=False)
