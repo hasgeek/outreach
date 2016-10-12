@@ -14,7 +14,7 @@ def jsonify_item(item):
             'name': item.name,
             'title': item.title,
             'id': item.id,
-            'image': item.images[0].url if item.images else None,
+            'image': {'url': item.images[0].url, 'title': item.images[0].title} if item.images else None,
             'description': item.description.text,
             'quantity_available': item.quantity_available,
             'is_available': item.is_available,
@@ -39,6 +39,7 @@ def jsonify_category(category):
         return {
             'id': category.id,
             'title': category.title,
+            'description': category.description.text,
             'name': category.name,
             'item_collection_id': category.item_collection_id,
             'items': category_items

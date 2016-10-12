@@ -22,6 +22,9 @@
             <div>
               <h1 class="category-heading">{{title}}</h1>
             </div>
+            {{#description}}
+              <div class="category-description">{{{ description }}}</div>
+            {{/}}
             <div class="category-items">
             {{#items}}{{# { item: . } }}
               {{#order.line_items}} {{# { line_item: . } }}
@@ -34,14 +37,11 @@
                           <p class="discount-price ticket-price">{{ formatToIndianRupee(line_item.unit_final_amount) }}</p>
                         {{/if}}
                         <p class="ticket-price {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}strike{{/if}}">{{ formatToIndianRupee(line_item.base_price) }}</p>
-                        {{#if line_item.quantity_available > 0}}
-                          <p class="valid-upto"><i class="fa fa-fw fa-long-arrow-up"></i>Price goes up after {{line_item.price_valid_upto}}</p>
-                        {{/if}}
                       </div>
                       {{#line_item.item_image}}
-                      <div class="ticket-image">
-                        <img src="{{line_item.item_image}}">
-                      </div>
+                        <div class="ticket-image">
+                          <img src="{{url}}" alt="{{title}}">
+                        </div>
                       {{/}}
                       <div class="ticket-description">{{{ line_item.item_description }}}</div>
                       {{#line_item.discount_policies}}
@@ -202,7 +202,12 @@
             {{#errormsg.phone}}<p class="form-error-msg">{{ errormsg.phone }}</p>{{/}}
           </div>
           <div class="checkout-confirmation">
-            <p class="summary">Booking Summary</p>
+            {{#if order.status == 0}}
+              <p class="summary">Your're interested in</p>
+            {{else}}
+              <p class="summary">Booking Summary</p>
+            {{/if}}
+
             {{#order.line_items}} {{# { line_item: . } }}
               {{#if line_item.quantity > 0 }}
                 <div class="item-summary">
@@ -227,7 +232,7 @@
             {{#if order.status == 0}}
               <button class="boxoffice-button boxoffice-button-info edit-order" type="button" on-click="selectItems(event)">Back</button>
               <button type="submit" class="boxoffice-button boxoffice-button-action" {{#loadingOrder}}disabled{{/}} on-click="checkout(event, false)">
-              Submit {{#loadingOrder}}<i class="fa fa-spinner fa-spin" intro='fly:{"x":0,"y":"0"}'>{{/}}
+              Call me {{#loadingOrder}}<i class="fa fa-spinner fa-spin" intro='fly:{"x":0,"y":"0"}'>{{/}}
               </button>
             {{else}}
               <button class="boxoffice-button boxoffice-button-info edit-order" type="button" on-click="selectItems(event)">Edit order</button>
@@ -281,11 +286,12 @@
     color: #fff;
     font-size: 15px;
     display: inline-block;
-    margin: 5px;
+    margin: 5px 0;
   }
   .boxoffice-button-action {
     background-color: #5CB85C;
     border-color: #4CAE4C;
+    margin-left: 5px;
   }
   .boxoffice-button-info {
     background-color: #5BC0DE;
@@ -420,6 +426,11 @@
       border-width: 21px;
     }
   }
+  .category-description {
+    font-size: 15px;
+    text-align: left;
+    margin: 25px 0;
+  }
   .category-items {
     text-align: center;
   }
@@ -471,6 +482,11 @@
     width: 50%;
     margin: 15px auto;
   }
+  @media (min-width: 768px) {
+    .ticket-image {
+      width: 70%;
+    }
+  }
   .ticket-image img{
     width: 100%;
   }
@@ -491,7 +507,6 @@
   }
   .ticket-description {
     font-size: 15px;
-    text-align: left;
   }
   .ticket-description p {
     margin: 7px 0;
