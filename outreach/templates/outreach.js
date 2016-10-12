@@ -602,7 +602,6 @@ $(function() {
             }),
             headers: {'X-Requested-With': 'XMLHttpRequest'},
             contentType: 'application/json',
-            data: items,
             timeout: 5000,
             retries: 5,
             retryInterval: 5000,
