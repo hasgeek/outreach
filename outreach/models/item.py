@@ -79,7 +79,7 @@ class ItemImage(BaseScopedNameMixin, db.Model):
     item_id = db.Column(None, db.ForeignKey('item.id'), nullable=False, index=True)
     item = db.relationship(Item, backref=db.backref('images', cascade='all, delete-orphan'))
     parent = db.synonym('item')
-    primary = db.Column(db.Boolean, nullable=True, default=False)
+    primary = db.Column(db.Boolean, nullable=True, default=None)
 
     def set_as_primary(self):
         self.primary = True
