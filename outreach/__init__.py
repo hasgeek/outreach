@@ -27,8 +27,8 @@ assets['outreach.js'][version] = 'js/scripts.js'
 
 
 from . import extapi, views  # noqa
-from outreach.models import db, User, Item, ItemImage, Price, DiscountPolicy, DiscountCoupon, ItemCollection, Organization, Category  # noqa
-from siteadmin import ItemCollectionModelView, ItemModelView, ItemImageView, PriceModelView, DiscountPolicyModelView, DiscountCouponModelView, OrganizationModelView, CategoryModelView  # noqa
+from outreach.models import db, Order, User, Item, ItemImage, Price, DiscountPolicy, DiscountCoupon, ItemCollection, Organization, Category  # noqa
+from siteadmin import ItemCollectionModelView, ItemModelView, ItemImageView, PriceModelView, OrganizationModelView, CategoryModelView, OrderModelView  # noqa
 
 
 # Configure the app
@@ -58,7 +58,6 @@ def init_for(env):
         admin.add_view(ItemModelView(Item, db.session))
         admin.add_view(ItemImageView(ItemImage, db.session))
         admin.add_view(PriceModelView(Price, db.session))
-        admin.add_view(DiscountPolicyModelView(DiscountPolicy, db.session))
-        admin.add_view(DiscountCouponModelView(DiscountCoupon, db.session))
+        admin.add_view(OrderModelView(Order, db.session))
     except AssertionError:
         pass

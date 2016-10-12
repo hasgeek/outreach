@@ -15,6 +15,14 @@ class OrganizationModelView(SiteAdminModelView):
     form_excluded_columns = ['userid', 'item_collections', 'discount_policies', 'orders', 'created_at', 'updated_at']
 
 
+class OrderModelView(SiteAdminModelView):
+    can_delete = False
+    column_display_pk = True
+    column_filters = ['item_collection']
+    column_list = ('id', 'buyer_email', 'buyer_fullname', 'buyer_phone', 'status')
+    form_excluded_columns = ['parent', 'items', 'orders', 'categories', 'created_at', 'updated_at']
+
+
 class ItemCollectionModelView(SiteAdminModelView):
     can_delete = False
     column_display_pk = True
