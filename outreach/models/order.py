@@ -15,6 +15,8 @@ class ORDER_STATUS(LabeledEnum):
     PURCHASE_ORDER = (0, __("Purchase Order"))
     SALES_ORDER = (1, __("Sales Order"))
     INVOICE = (2, __("Invoice"))
+    CUSTOMER_INQUIRY = (3, __("Customer inquiry"))
+
 
 ORDER_STATUS.CONFIRMED = [ORDER_STATUS.SALES_ORDER, ORDER_STATUS.INVOICE]
 

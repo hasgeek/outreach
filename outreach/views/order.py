@@ -7,7 +7,7 @@ from coaster.views import load_models
 from baseframe import _
 from .. import app
 from utils import xhr_only, cors
-from ..models import db, LineItem, Item, ItemCollection, User, Order, DiscountPolicy, DiscountCoupon, OrderSession, OnlinePayment, PaymentTransaction, CURRENCY
+from ..models import db, LineItem, Item, ItemCollection, User, Order, DiscountPolicy, DiscountCoupon, OrderSession, OnlinePayment, PaymentTransaction, CURRENCY, ORDER_STATUS
 from ..forms import LineItemForm, BuyerForm, OrderSessionForm
 from ..extapi import razorpay
 from outreach.mailclient import send_receipt_mail
@@ -165,6 +165,68 @@ def order(item_collection):
         payment_url=url_for('payment', order=order.id),
         free_order_url=url_for('free', order=order.id),
         final_amount=order.get_amounts().final_amount), 201)
+
+
+@app.route('/ic/<item_collection>/inquiry',
+           methods=['OPTIONS', 'POST'])
+@load_models(
+    (ItemCollection, {'id': 'item_collection'}, 'item_collection')
+    )
+@xhr_only
+@cors
+def inquiry(item_collection):
+    buyer_form = BuyerForm.from_json(request.json.get('buyer'))
+    # See comment in BuyerForm about CSRF
+    buyer_form.csrf_enabled = False
+    if not buyer_form.validate():
+        return make_response(jsonify(message='Invalid buyer details'), 400)
+
+    user = User.query.filter_by(email=buyer_form.email.data).first()
+
+    order = Order(user=user,
+        status=ORDER_STATUS.CUSTOMER_INQUIRY,
+        organization=item_collection.organization,
+        item_collection=item_collection,
+        buyer_email=buyer_form.email.data,
+        buyer_fullname=buyer_form.fullname.data,
+        buyer_phone=buyer_form.phone.data)
+
+    line_item_forms = LineItemForm.process_list(request.json.get('line_items'))
+    if line_item_forms:
+        line_item_tups = LineItem.calculate([{'item_id': li_form.data.get('item_id')}
+            for li_form in line_item_forms
+                for x in range(li_form.data.get('quantity'))], coupons=sanitize_coupons(request.json.get('discount_coupons')))
+        for idx, line_item_tup in enumerate(line_item_tups):
+            item = Item.query.get(line_item_tup.item_id)
+            if line_item_tup.discount_policy_id:
+                policy = DiscountPolicy.query.get(line_item_tup.discount_policy_id)
+            else:
+                policy = None
+            if line_item_tup.discount_coupon_id:
+                coupon = DiscountCoupon.query.get(line_item_tup.discount_coupon_id)
+            else:
+                coupon = None
+
+            line_item = LineItem(order=order, item=item, discount_policy=policy,
+                line_item_seq=idx+1,
+                discount_coupon=coupon,
+                ordered_at=datetime.utcnow(),
+                base_amount=line_item_tup.base_amount,
+                discounted_amount=line_item_tup.discounted_amount,
+                final_amount=line_item_tup.base_amount-line_item_tup.discounted_amount)
+            db.session.add(line_item)
+
+    db.session.add(order)
+    if request.json.get('order_session'):
+        order_session_form = OrderSessionForm.from_json(request.json.get('order_session'))
+        order_session_form.csrf_enabled = False
+        if order_session_form.validate():
+            order_session = OrderSession(order=order)
+            order_session_form.populate_obj(order_session)
+            db.session.add(order_session)
+    db.session.commit()
+    # send email to mak
+    return make_response(jsonify(order_id=order.id, order_access_token=order.access_token))
 
 
 @app.route('/order/<order>/free', methods=['GET', 'OPTIONS', 'POST'])
