@@ -179,7 +179,6 @@ def inquiry(item_collection):
     # See comment in BuyerForm about CSRF
     buyer_form.csrf_enabled = False
     if not buyer_form.validate():
-        print 'Invalid buyer details'
         return make_response(jsonify(message='Invalid buyer details'), 400)
 
     user = User.query.filter_by(email=buyer_form.email.data).first()
