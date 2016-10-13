@@ -73,12 +73,13 @@ def inquiry(item_collection):
     user = User.query.filter_by(email=buyer_form.email.data).first()
 
     order = Order(user=user,
-        status=ORDER_STATUS.CUSTOMER_INQUIRY,
         organization=item_collection.organization,
         item_collection=item_collection,
         buyer_email=buyer_form.email.data,
         buyer_fullname=buyer_form.fullname.data,
         buyer_phone=buyer_form.phone.data)
+
+    order.register_inquiry()
 
     line_item_forms = LineItemForm.process_list(request.json.get('line_items'))
     if line_item_forms:

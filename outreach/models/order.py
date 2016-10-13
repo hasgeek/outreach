@@ -50,6 +50,7 @@ class Order(BaseMixin, db.Model):
     status = db.Column(db.Integer, default=ORDER_STATUS.PURCHASE_ORDER, nullable=False)
 
     initiated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    inquired_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     paid_at = db.Column(db.DateTime, nullable=True)
     invoiced_at = db.Column(db.DateTime, nullable=True)
     cancelled_at = db.Column(db.DateTime, nullable=True)
@@ -59,6 +60,7 @@ class Order(BaseMixin, db.Model):
     buyer_email = db.Column(db.Unicode(254), nullable=False)
     buyer_fullname = db.Column(db.Unicode(80), nullable=False)
     buyer_phone = db.Column(db.Unicode(16), nullable=False)
+    buyer_company = db.Column(db.Unicode(80), nullable=True)
 
     invoice_no = db.Column(db.Integer, nullable=True)
 
@@ -82,6 +84,10 @@ class Order(BaseMixin, db.Model):
             line_item.confirm()
         self.invoiced_at = datetime.utcnow()
         self.status = ORDER_STATUS.INVOICE
+
+    def register_inquiry(self):
+        self.inquired_at = datetime.utcnow()
+        self.status = ORDER_STATUS.CUSTOMER_INQUIRY
 
     def get_amounts(self):
         """

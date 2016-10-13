@@ -5,9 +5,15 @@ from decimal import Decimal
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.orderinglist import ordering_list
 from ..models import db, BaseScopedNameMixin, MarkdownColumn
-from ..models import ItemCollection, Category
+from ..models import ItemCollection
+
 
 __all__ = ['Item', 'ItemImage', 'Price']
+
+item_category = db.Table('item_category', db.Model.metadata,
+    db.Column('item_id', None, db.ForeignKey('item.id'), primary_key=True),
+    db.Column('category_id', None, db.ForeignKey('category.id'), primary_key=True),
+    db.Column('created_at', db.DateTime, default=datetime.utcnow, nullable=False))
 
 
 class Item(BaseScopedNameMixin, db.Model):
@@ -27,8 +33,7 @@ class Item(BaseScopedNameMixin, db.Model):
 
     parent = db.synonym('item_collection')
 
-    category_id = db.Column(None, db.ForeignKey('category.id'), nullable=False)
-    category = db.relationship(Category, backref=db.backref('items', cascade='all, delete-orphan'))
+    categories = db.relationship('Category', secondary=item_category)
 
     quantity_total = db.Column(db.Integer, default=0, nullable=False)
 
