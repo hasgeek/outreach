@@ -8,7 +8,6 @@ from .user import *
 from .item_collection import *
 from .category import *
 from .item import *
-from .discount_policy import *
 from .order import *
 from .line_item import *
 from .payment import *

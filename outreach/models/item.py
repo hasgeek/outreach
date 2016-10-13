@@ -6,7 +6,6 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.orderinglist import ordering_list
 from ..models import db, BaseScopedNameMixin, MarkdownColumn
 from ..models import ItemCollection, Category
-from ..models.discount_policy import item_discount_policy
 
 __all__ = ['Item', 'ItemImage', 'Price']
 
@@ -33,22 +32,16 @@ class Item(BaseScopedNameMixin, db.Model):
 
     quantity_total = db.Column(db.Integer, default=0, nullable=False)
 
-    discount_policies = db.relationship('DiscountPolicy', secondary=item_discount_policy, lazy='dynamic')
-
     cancellable_until = db.Column(db.DateTime, nullable=True)
 
     def current_price(self):
         """Return the current price object for an item."""
         return self.price_at(datetime.utcnow())
 
-    def discounted_price(self, discount_policy):
-        """Return the discounted price for an item."""
-        return Price.query.filter(Price.item == self, Price.discount_policy == discount_policy).one_or_none()
-
     def price_at(self, timestamp):
         """Return the price object for an item at a given time."""
         return Price.query.filter(Price.item == self, Price.start_at <= timestamp,
-            Price.end_at > timestamp, Price.discount_policy == None).order_by('created_at desc').first()  # noqa
+            Price.end_at > timestamp).order_by('created_at desc').first()  # noqa
 
     @classmethod
     def get_by_category(cls, category):
@@ -89,14 +82,10 @@ class Price(BaseScopedNameMixin, db.Model):
     __tablename__ = 'price'
     __uuid_primary_key__ = True
     __table_args__ = (db.UniqueConstraint('item_id', 'name'),
-        db.CheckConstraint('start_at < end_at', 'price_start_at_lt_end_at_check'),
-        db.UniqueConstraint('item_id', 'discount_policy_id'))
+        db.CheckConstraint('start_at < end_at', 'price_start_at_lt_end_at_check'))
 
     item_id = db.Column(None, db.ForeignKey('item.id'), nullable=False)
     item = db.relationship(Item, backref=db.backref('prices', cascade='all, delete-orphan'))
-
-    discount_policy_id = db.Column(None, db.ForeignKey('discount_policy.id'), nullable=True)
-    discount_policy = db.relationship('DiscountPolicy', backref=db.backref('price', cascade='all, delete-orphan'))
 
     parent = db.synonym('item')
     start_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

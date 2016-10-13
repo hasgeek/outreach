@@ -27,7 +27,7 @@ assets['outreach.js'][version] = 'js/scripts.js'
 
 
 from . import extapi, views  # noqa
-from outreach.models import db, Order, User, Item, ItemImage, Price, DiscountPolicy, DiscountCoupon, ItemCollection, Organization, Category  # noqa
+from outreach.models import db, Order, User, Item, ItemImage, Price, ItemCollection, Organization, Category  # noqa
 from siteadmin import ItemCollectionModelView, ItemModelView, ItemImageView, PriceModelView, OrganizationModelView, CategoryModelView, OrderModelView  # noqa
 
 
