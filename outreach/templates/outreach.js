@@ -212,7 +212,9 @@ $(function() {
             access_token: '',
             line_items: lineItems,
             final_amount: 0.0,
-            readyToCheckout: false
+            readyToCheckout: false,
+            org_name: boxoffice.widgetConfig.org || boxoffice.config.orgName,
+            org_logo: boxoffice.widgetConfig.razorpayBanner || boxoffice.config.razorpayBanner
           },
           // Prefill name, email, phone if user is found to be logged in
           buyer: {
@@ -454,10 +456,10 @@ $(function() {
                   });
 
                   //Currently online transaction limit is 5 lakhs, so disable checkout option
-                  if(data.order.final_amount > 500000) {
-                    readyToCheckout = false;
-                    boxoffice.ractive.set('tabs.selectItems.errorMsg', "Orders for above Rs 5 lakh cannot be processed online. Please contact us to complete your order");
-                  }
+                  // if(data.order.final_amount > 500000) {
+                  //   readyToCheckout = false;
+                  //   boxoffice.ractive.set('tabs.selectItems.errorMsg', "Orders for above Rs 5 lakh cannot be processed online. Please contact us to complete your order");
+                  // }
                 }
 
                 boxoffice.ractive.set({

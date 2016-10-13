@@ -17,6 +17,13 @@
         <button class="cart-btn {{#if order.readyToCheckout}}items-present{{/if}}" on-click="openCart(event, true)">
           <i class="fa fa-shopping-cart"></i>
         </button>
+        
+        <div class="proceed-button-wrapper">
+          <button class="boxoffice-button boxoffice-button-info" on-click="getContactDetails(event)">
+            <i class="fa fa-phone"></i> Talk to us
+          </button>
+        </div>
+
         {{#section.categories}}
           <div id="{{name}}" class="categories">
             <div>
@@ -30,7 +37,54 @@
               {{#order.line_items}} {{# { line_item: . } }}
                 {{#if line_item.item_name === item.name }}
                   <div class="card clearfix {{#line_item.quantity}}ticket-selected{{/}}" id="{{line_item.item_name}}">
-                    <div class="ticket-details">
+                    <div class="ticket-details-right">
+                      {{#if line_item.item_image}}
+                        <div class="ticket-image">
+                          <img src="{{line_item.item_image.url}}" alt="{{line_item.item_image.title}}">
+                        </div>
+                      {{else}}
+                        <div class="org-logo">
+                          <img src="{{order.org_logo}}" alt="{{order.org_name}}">
+                        </div>
+                      {{/if}}
+
+                      <div class="ticket-price-qty clearfix">
+                        {{#if line_item.is_available}}
+                          {{#if line_item.quantity_available < 5}}
+                            <p class="few-ticket">
+                              <span class="available-count">Only {{line_item.quantity_available}} available</span>
+                            </p>
+                          {{/if}}
+                          {{#if line_item.quantity > 0}}
+                            <div class="price-details-wrapper" outro='fly:{"x":10,"y":0,"duration":100}'>
+                              <div class="ticket-qty-wrapper">
+                                <button class="decrement" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)">-</button>
+                                <input type="number" class="ticket-qty" name="quantity" min="0" max="{{ line_item.quantity_available }}" value="{{ line_item.quantity }}" disabled>
+                                <button class="increment" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">+</button>
+                              </div>
+                            </div>
+                          {{else}}
+                            <div>
+                              <button class="boxoffice-button boxoffice-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">I am interested</button>
+                            </div>
+                          {{/if}}
+                          <div class="item-amount">
+                            {{#line_item.discounted_amount && !isLoadingFail}}
+                              <p intro-outro='fly:{"x":10,"y":"0"}' class="discount-amount">Discount <span>{{formatToIndianRupee(line_item.discounted_amount)}}</span></p>
+                            {{/}}
+                            {{#line_item.discounted_amount || line_item.final_amount && !isLoadingFail}}
+                              <p intro-outro='fly:{"x":10,"y":"0"}' class="subtotal">Subtotal <span>{{formatToIndianRupee(line_item.final_amount)}}</span></p>
+                            {{/}}
+                          </div>
+                        {{else}}
+                          <div class="sold-out-wrapper" intro='fly:{"x":100,"y":0}'>
+                            <p class="sold-out">Sold out</p>
+                          </div>
+                        {{/if}}
+                      </div>
+                    </div>
+
+                    <div class="ticket-details-left">
                       <p class="ticket-title">{{ line_item.item_title }}</p>
                       <div class="ticket-price-wrapper">
                         {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}
@@ -38,11 +92,6 @@
                         {{/if}}
                         <p class="ticket-price {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}strike{{/if}}">{{ formatToIndianRupee(line_item.base_price) }}</p>
                       </div>
-                      {{#line_item.item_image}}
-                        <div class="ticket-image">
-                          <img src="{{url}}" alt="{{title}}">
-                        </div>
-                      {{/}}
                       <div class="ticket-description">{{{ line_item.item_description }}}</div>
                       {{#line_item.discount_policies}}
                         {{#if is_automatic || activated || pre_applied }}
@@ -51,42 +100,6 @@
                           </p>
                         {{/if}}
                       {{/line_item.discount_policies}}
-                    </div>
-                    <div class="ticket-price-qty">
-                      {{#if line_item.is_available}}
-                        {{#if line_item.quantity_available < 5}}
-                          <div class="ticket-description">
-                            <p class="few-ticket">
-                              <span class="available-count">Only {{line_item.quantity_available}} available</span>
-                            </p>
-                          </div>
-                        {{/if}}
-                        {{#if line_item.quantity > 0}}
-                          <div class="price-details-wrapper" outro='fly:{"x":10,"y":0,"duration":100}'>
-                            <div class="ticket-qty-wrapper">
-                              <button class="decrement" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)">-</button>
-                              <input type="number" class="ticket-qty" name="quantity" min="0" max="{{ line_item.quantity_available }}" value="{{ line_item.quantity }}" disabled>
-                              <button class="increment" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">+</button>
-                            </div>
-                          </div>
-                        {{else}}
-                          <div class="price-details-wrapper" intro='fly:{"x":10,"y":0,"duration":100}'>
-                            <button class="boxoffice-button boxoffice-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">Add to cart</button>
-                          </div>
-                        {{/if}}
-                        <div class="item-amount">
-                          {{#line_item.discounted_amount && !isLoadingFail}}
-                            <p intro-outro='fly:{"x":10,"y":"0"}' class="discount-amount">Discount <span>{{formatToIndianRupee(line_item.discounted_amount)}}</span></p>
-                          {{/}}
-                          {{#line_item.discounted_amount || line_item.final_amount && !isLoadingFail}}
-                            <p intro-outro='fly:{"x":10,"y":"0"}' class="subtotal">Subtotal <span>{{formatToIndianRupee(line_item.final_amount)}}</span></p>
-                          {{/}}
-                        </div>
-                      {{else}}
-                        <div class="sold-out-wrapper" intro='fly:{"x":100,"y":0}'>
-                          <p class="sold-out">Sold out</p>
-                        </div>
-                      {{/if}}
                     </div>
                   </div>
                 {{/if}}
@@ -135,29 +148,7 @@
             <button class="boxoffice-button boxoffice-button-info cart-footer-btn" on-click="getContactDetails(event)">
               <i class="fa fa-phone"></i> Talk to us
             </button>
-            {{#order.readyToCheckout}}
-                <button id="stage1-proceed" class="boxoffice-button boxoffice-button-action cart-footer-btn" on-click="continue(event)" {{#loadingPrice && !isLoadingFail}}disabled{{/}}>
-                  Proceed to checkout
-                  {{#loadingPrice && !isLoadingFail}}
-                    <i class="fa fa-spinner fa-spin"></i>
-                  {{/}}
-                </button>
-            {{/order.readyToCheckout}}
           </div>
-        </div>
-
-        <div class="proceed-button-wrapper">
-          <button class="boxoffice-button boxoffice-button-info" on-click="getContactDetails(event)">
-            <i class="fa fa-phone"></i> Talk to us
-          </button>
-          {{#order.readyToCheckout}}
-            <button id="stage1-proceed" class="boxoffice-button boxoffice-button-action" on-click="continue(event)" {{#loadingPrice && !isLoadingFail}}disabled{{/}}>
-              Proceed to checkout
-              {{#loadingPrice && !isLoadingFail}}
-                <i class="fa fa-spinner fa-spin"></i>
-              {{/}}
-            </button>
-          {{/order.readyToCheckout}}
         </div>
 
         <div>
@@ -291,7 +282,7 @@
     color: #fff;
     font-size: 15px;
     display: inline-block;
-    margin: 5px 0;
+    margin: 0;
   }
   .boxoffice-button-action {
     background-color: #5CB85C;
@@ -308,6 +299,11 @@
       font-size: 17px;
     } 
   }
+  .clearfix:after {
+    content: " "
+    display: table
+  }
+
   .payment-progress-wrapper {
     background-color: #eee;
     padding: 20px;
@@ -452,7 +448,6 @@
     background-color: #fff;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
     border-radius: 5px;
-    padding: 20px;
     background-color: #fff;
     min-height: 196px;
     margin: 25px 0;
@@ -463,19 +458,20 @@
       margin: 25px 1%;
     }
   }
-  @media (min-width: 1024px) {
-    .card {
-      width: 31%;
-      margin: 25px 1.16%;
-    }
-  }
   .ticket-selected {
     background-color: #f7f6ec;
   }
-  .ticket-details {
-    width: 100%;
+  .ticket-details-left {
+    float: left;
     word-break: break-word;
-    width: 100%;
+    width: 50%;
+    padding: 15px;
+  }
+  .ticket-details-right {
+    float: right;
+    word-break: break-word;
+    width: 50%;
+    padding: 15px;
   }
   .ticket-title {
     font-size: 18px;
@@ -489,15 +485,17 @@
     }
   }
   .ticket-image {
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    overflow: hidden;
+  }
+  .org-logo {
     width: 50%;
-    margin: 15px auto;
+    margin: auto;
   }
-  @media (min-width: 768px) {
-    .ticket-image {
-      width: 70%;
-    }
-  }
-  .ticket-image img{
+  .ticket-image img,
+  .org-logo img {
     width: 100%;
   }
   .discount {
@@ -517,6 +515,7 @@
   }
   .ticket-description {
     font-size: 15px;
+    margin-top: 15px;
   }
   .ticket-description p {
     margin: 7px 0;
@@ -524,23 +523,20 @@
   .ticket-description .fa {
     padding-right: 5px;
   }
-  .ticket-description .few-ticket {
-    text-align: right;
+  .few-ticket {
     font-size: 13px;
     font-style: italic;
+    margin: 0 0 5px;
   }
   .available-count {
     color: #e42c42;
   }
   .ticket-price-qty {
     margin-top: 20px;
-    position: relative;
-    min-width: 190px;
     width: 100%;
   }
   .price-details-wrapper {
-    float: right;
-    margin: 0 0 10px;
+    margin: 0 auto 10px;
   }
   .ticket-price-wrapper {
     margin-top: 4px;
@@ -573,7 +569,8 @@
     overflow: hidden;
     background: #f6f3c2;
     font-size: 18px;
-    float: right;
+    width: 80px;
+    margin: auto;
   }
   .ticket-qty {
     width: 32px;
@@ -623,9 +620,6 @@
   .discount-amount, .subtotal {
     margin: 5px 0;
   }
-  .sold-out-wrapper {
-    float: right;
-  }
   .sold-out {
     font-size: 15px;
     color: #fff;
@@ -633,7 +627,7 @@
     width: 100px;
     border-radius: 0 10px 0 10px;
     padding: 5px;
-    margin: 0;
+    margin: 0 auto;
     text-align: center;
     box-shadow: 1px 1px 1px rgba(0,0,0,0.3);
     font-weight: bold;
@@ -685,8 +679,7 @@
     clear: both;
     font-size: 15px;
     color: #888;
-    margin: 10px 0 0;
-    text-align: right;
+    margin: 10px auto 0;
   }
   .item-amount .rupee-sign {
     font-size: 13px;
@@ -773,6 +766,7 @@
   .close-button {
     border: 0;
     box-shadow: none;
+    background-color: transparent;
     margin-right: 5px;
     font-size: 25px;
     padding: 0;
