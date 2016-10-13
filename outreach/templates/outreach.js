@@ -250,6 +250,11 @@ $(function() {
               }
             }
           },
+          getLineItemsLength: function(line_items) {            
+            return line_items.reduce(function(previousline_item, currentline_item) {
+              return {quantity: previousline_item.quantity + currentline_item.quantity};
+            }).quantity;
+          },
           formatToIndianRupee: function(value) {
             // Takes a floating point value and formats it to the Indian currency format
             // with the rupee sign.

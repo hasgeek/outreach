@@ -54,12 +54,14 @@
                     </div>
                     <div class="ticket-price-qty">
                       {{#if line_item.is_available}}
-                        <div class="ticket-description">
-                          <p class="few-ticket">
-                            <span class="available-count">Only {{line_item.quantity_available}} available</span>
-                          </p>
-                        </div>
-                          {{#if line_item.quantity > 0}}
+                        {{#if line_item.quantity_available < 5}}
+                          <div class="ticket-description">
+                            <p class="few-ticket">
+                              <span class="available-count">Only {{line_item.quantity_available}} available</span>
+                            </p>
+                          </div>
+                        {{/if}}
+                        {{#if line_item.quantity > 0}}
                           <div class="price-details-wrapper" outro='fly:{"x":10,"y":0,"duration":100}'>
                             <div class="ticket-qty-wrapper">
                               <button class="decrement" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)">-</button>
@@ -67,11 +69,11 @@
                               <button class="increment" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">+</button>
                             </div>
                           </div>
-                          {{else}}
+                        {{else}}
                           <div class="price-details-wrapper" intro='fly:{"x":10,"y":0,"duration":100}'>
                             <button class="boxoffice-button boxoffice-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">Add to cart</button>
                           </div>
-                          {{/if}}
+                        {{/if}}
                         <div class="item-amount">
                           {{#line_item.discounted_amount && !isLoadingFail}}
                             <p intro-outro='fly:{"x":10,"y":"0"}' class="discount-amount">Discount <span>{{formatToIndianRupee(line_item.discounted_amount)}}</span></p>
@@ -201,33 +203,39 @@
             <label class="group-label">Phone</label>
             {{#errormsg.phone}}<p class="form-error-msg">{{ errormsg.phone }}</p>{{/}}
           </div>
-          <div class="checkout-confirmation">
-            {{#if order.status == 0}}
-              <p class="summary">Your're interested in</p>
-            {{else}}
-              <p class="summary">Booking Summary</p>
-            {{/if}}
 
-            {{#order.line_items}} {{# { line_item: . } }}
-              {{#if line_item.quantity > 0 }}
-                <div class="item-summary">
-                  <p class="booked-ticket-title"><i class="fa fa-ticket"></i>{{ line_item.item_title }}</p>
-                  <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
-                  {{#line_item.discounted_amount}}
-                    <p class="booked-ticket-qty">Discount {{ formatToIndianRupee(line_item.discounted_amount) }}</p>
-                  {{/line_item.discounted_amount}}
-                  {{#line_item.discount_policies}}
-                    {{#if activated}}
-                    <p class="discount-applied">Applied {{ title }}</p>
-                    {{/if}}
-                  {{/line_item.discount_policies}}
-                  <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
-                </div>
+          {{#if getLineItemsLength(order.line_items) > 0}}
+            <div class="checkout-confirmation">
+              {{#if order.status == 0}}
+                <p class="summary">Your're interested in</p>
+              {{else}}
+                <p class="summary">Booking Summary</p>
               {{/if}}
-            {{/}}{{/order.line_items}}
-            <p class="price">Amount Payable <span class="final-amount"><b> {{ formatToIndianRupee(order.final_amount) }}</b></span></p>
-            <hr class="separator">
-          </div>
+
+              <ol class="cart-list">
+                {{#order.line_items}} {{# { line_item: . } }}
+                  {{#if line_item.quantity > 0 }}
+                    <li class="item-summary">
+                      <span class="booked-ticket-title">{{ line_item.item_title }}</span>
+                      <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
+                      {{#line_item.discounted_amount}}
+                        <p class="booked-ticket-qty">Discount {{ formatToIndianRupee(line_item.discounted_amount) }}</p>
+                      {{/line_item.discounted_amount}}
+                      {{#line_item.discount_policies}}
+                        {{#if activated}}
+                        <p class="discount-applied">Applied {{ title }}</p>
+                        {{/if}}
+                      {{/line_item.discount_policies}}
+                      <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
+                    </li>
+                  {{/if}}
+                {{/}}{{/order.line_items}}
+              </ol>
+              <p class="price">Amount Payable <span class="final-amount"><b> {{ formatToIndianRupee(order.final_amount) }}</b></span></p>
+              <hr class="separator">
+            </div>
+          {{/if}}
+
           <div class="proceed-button-wrapper">
             {{#if order.status == 0}}
               <button class="boxoffice-button boxoffice-button-info edit-order" type="button" on-click="selectItems(event)">Back</button>
@@ -253,10 +261,7 @@
             <p class="confirmation-icon"><i class="fa fa-check-circle"></i></p>
             <p class="confirmation-header">Thank you for your order!</p>
             <div class="confirmation-msg">
-              <p>We’ve mailed you the cash receipt.</p>
-              <div class="receipt-btn-wrapper">
-                <a href="{{ cashReceiptURL }}" target="_blank" class="boxoffice-button boxoffice-button-action receipt-button" on-click="fire('eventAnalytics','view cash receipt', 'cash receipt')">See cash receipt</a>
-              </div>
+              <p>We'll mail you the cash receipt within one business day.</p>
             </div>
           {{/section}}
         {{else}}
@@ -429,7 +434,12 @@
   .category-description {
     font-size: 15px;
     text-align: left;
-    margin: 25px 0;
+    margin: 15px 0 0;
+  }
+  @media (min-width: 768px) {
+    .category-description {
+      width: 55%;
+    }
   }
   .category-items {
     text-align: center;
@@ -757,8 +767,8 @@
     overflow-y: auto;
     max-height: 75%;
   }
-  .cart-body .cart-list {
-    padding: 0;
+  .cart-list {
+    padding: 0 0 0 15px;
   }
   .close-button {
     border: 0;
@@ -944,7 +954,7 @@
   .discount-applied {
     font-size: 13px;
     text-align: right;
-    margin-bottom: 5px;
+    margin: 5px 0;
   }
   .booked-ticket-qty .rupee-sign {
     font-size: 11px;

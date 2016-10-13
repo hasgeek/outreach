@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>{{order.item_collection.description}}</title>
+  <style type="text/css">
+    * { 
+      margin: 0; 
+      padding: 0; 
+    }
+
+    body {
+      font-family: "Source Sans Pro",Arial,sans-serif;
+      font-size: 16px;
+      line-height: 1.2;
+      color: #333;
+      background-color: #fff
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    p { 
+      margin: 5px 0 5px;
+      font-size: 15px;
+    }
+
+    .content {
+      margin-top: 15px;
+    }
+
+    .header { 
+      font-size: 20px; 
+      text-align: center; 
+      margin-bottom: 30px; 
+      padding-bottom: 10px; 
+      border-bottom: 1px solid #000;
+    }
+
+    .logo { 
+      float: left;
+      max-width: 150px;
+      margin-bottom: 10px;
+    }
+
+    .logo img {
+      width: 100%;
+    }
+
+    .address { 
+      float: right;
+    }
+
+    .company-name {
+      font-size: 20px;
+      margin: 0 0 10px;
+    }
+
+    .customer {
+      padding-top: 20px;
+      clear: both;
+    }
+
+    table { 
+      border-collapse: collapse; 
+    }
+
+    table td, table th { 
+      border: 1px solid #000; 
+      padding: 5px;
+    }
+
+    table td {
+      font-size: 15px;
+    }
+
+    .center { 
+      text-align: center;
+    }
+
+    .customer-details {
+      float: left;
+      min-width: 250px;
+      margin-bottom: 10px;
+    }
+
+    .details { 
+      float: right;
+      margin-bottom: 20px;
+    }
+
+    .items {
+      width: 100%;
+      clear: both;
+    }
+
+    .item-description {
+      max-width: 200px;
+    }
+
+    .gray { 
+      background-color: #eee; 
+    }
+
+    .total, .total-amount {
+      font-weight: 600;
+    }
+
+    .terms {
+      margin-top: 20px;
+    }
+
+    .button {
+      border-width: 0px 0px 3px;
+      border-style: solid;
+      border-radius: 5px;
+      padding: 6px 12px;
+      color: #fff;
+      font-size: 15px;
+      display: inline-block;
+      background-color: #5BC0DE;
+      border-color: #46B8DA;
+      margin: 15px auto;
+    }
+
+    .footer {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+
+    <p>Hello {{ order.buyer_fullname }},</p>
+
+    <p class="content">Thanks for your interest in {{ order.item_collection.title }}.</p>
+
+    {% if order.is_confirmed %}
+      <p class="content">We'll mail you the cash receipt within one business day.</p>
+    {% else %}
+      <p class="content">We will contact you within the next 24 hours by phone or email.</p>
+    {% endif %}
+
+    {% if order.is_confirmed %}
+      <h1 class="header">Order details</h1>
+      
+      <div class="company-details">
+        {%- if org.details.get('logo') %}
+          <div class="logo">
+           <img src="{{org.details.get('logo')}}"/>
+          </div>
+        {%- endif %}
+
+        <div class="address">
+          {%- if org.details.get('address') %}
+            {{org.details.get('address') | safe}}
+          {%- endif %}
+          {%- if org.details.get('cin') %}
+            <p>CIN: {{org.details.get('cin')}}</p>
+          {%- endif %}
+          {%- if org.details.get('pan') %}
+            <p>PAN No: {{org.details.get('pan')}}</p>
+          {%- endif %}
+          {%- if org.details.get('service_tax_no') %}
+            <p>Service Tax No: {{org.details.get('service_tax_no')}}</p>
+          {%- endif %}
+          {%- if org.details.get('website') %}
+            <p><a href="{{org.details.get('website')}}">{{org.details.get('website')}}</a></p>
+          {%- endif %}
+          <p><a href="mailto:{{org.contact_email}}">{{org.contact_email}}</a></p>
+        </div>    
+      </div>
+      
+      <div class="customer">
+        <table class="customer-details">
+          <tr>
+            <th class="gray" colspan="2">Bill To</th>
+          </tr>
+          <tr>
+            <td class="gray">Name</td>
+            <td>{{ order.buyer_fullname }}</td>
+          </tr>
+          <tr>
+            <td class="gray">Email</td>
+            <td>{{ order.buyer_email }}</td>
+          </tr>
+          <tr>
+            <td class="gray">Phone</td>
+            <td>{{ order.buyer_phone }}</td>
+          </tr>
+        </table>
+
+        <table class="details">
+          <tr>
+            <td class="gray">Date</td>
+            <td>{{ order.paid_at | invoice_date('%d %b %Y') }}</td>
+          </tr>
+        </table>  
+      </div>
+    {% else %}
+      <h1 class="header">Interested items</h1>     
+    {% endif %}
+      
+    {% if line_items|length > 0 %}
+      <table class="items">    
+        <tr>
+          <th>Item No:</th>
+          <th>Base Price</th>
+          <th>Discount</th>
+          <th>Final Price</th>
+        </tr>
+        
+        {% for line_item in line_items -%}
+          <tr>
+            <td class="center" rowspan="2" valign="top">{{ line_item.line_item_seq }}</td>
+            <td colspan="3">
+              <span class="item-title">{{ line_item.item.title }}</span><br>
+              <span class="item-description">{{ line_item.item.description.text|safe }}</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="center">&#8377; {{ line_item.base_amount }}</td>
+            <td class="center">&#8377; {{ line_item.discounted_amount }}</td>
+            <td class="center">&#8377; {{ line_item.final_amount }}</td>
+          </tr>
+        {%- endfor %}
+        
+        <tr>
+            <td></td>
+            <td colspan="2" class="total gray">Total</td>
+            <td class="total-amount gray center"><div id="total">&#8377; {{ order.get_amounts().final_amount }}</div></td>
+        </tr>
+      </table>
+    {% endif %}
+
+    <p class="footer">Thank you,</p>
+    <p>{{ org.title }}</p>
+  
+  </div>
+</body>
+
+</html>

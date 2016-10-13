@@ -10,7 +10,7 @@ from utils import xhr_only, cors
 from ..models import db, LineItem, Item, ItemCollection, User, Order, DiscountPolicy, DiscountCoupon, OrderSession, OnlinePayment, PaymentTransaction, CURRENCY, ORDER_STATUS
 from ..forms import LineItemForm, BuyerForm, OrderSessionForm
 from ..extapi import razorpay
-from outreach.mailclient import send_receipt_mail
+from outreach.mailclient import send_confirmation_mail
 from custom_exceptions import PaymentGatewayError
 
 
@@ -226,7 +226,7 @@ def inquiry(item_collection):
             order_session_form.populate_obj(order_session)
             db.session.add(order_session)
     db.session.commit()
-    # send email to mak
+    send_confirmation_mail.delay(order.id, "Thank you for your interest!")
     return make_response(jsonify(order_id=order.id, order_access_token=order.access_token))
 
 
@@ -250,7 +250,7 @@ def free(order):
                 line_item.discount_coupon.update_used_count()
                 db.session.add(line_item.discount_coupon)
         db.session.commit()
-        send_receipt_mail.delay(order.id)
+        send_confirmation_mail.delay(order.id)
         return make_response(jsonify(message="Free order confirmed"), 201)
     else:
         return make_response(jsonify(message='Free order confirmation failed'), 402)
@@ -294,7 +294,7 @@ def payment(order):
                 line_item.discount_coupon.update_used_count()
                 db.session.add(line_item.discount_coupon)
         db.session.commit()
-        send_receipt_mail.delay(order.id)
+        send_confirmation_mail.delay(order.id)
         return make_response(jsonify(message="Payment verified"), 201)
     else:
         online_payment.fail()
