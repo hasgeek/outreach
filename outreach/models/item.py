@@ -2,42 +2,52 @@
 
 from datetime import datetime
 from decimal import Decimal
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.ext.orderinglist import ordering_list
-from ..models import db, BaseScopedNameMixin, MarkdownColumn
-from ..models import ItemCollection
+from ..models import db, BaseScopedNameMixin, MarkdownColumn, Organization, ItemCollection, Category
 
 
-__all__ = ['Item', 'ItemImage', 'Price']
+__all__ = ['InventoryItem', 'Image', 'Price']
 
-item_category = db.Table('item_category', db.Model.metadata,
-    db.Column('item_id', None, db.ForeignKey('item.id'), primary_key=True),
-    db.Column('category_id', None, db.ForeignKey('category.id'), primary_key=True),
+inventory_item_sale_item = db.Table('inventory_item_sale_item', db.Model.metadata,
+    db.Column('inventory_item_id', None, db.ForeignKey('inventory_item.id'), primary_key=True),
+    db.Column('sale_item_id', None, db.ForeignKey('sale_item.id'), primary_key=True),
     db.Column('created_at', db.DateTime, default=datetime.utcnow, nullable=False))
 
 
-class Item(BaseScopedNameMixin, db.Model):
-    """Represents an item in the item collection."""
+class InventoryItem(BaseScopedNameMixin, db.Model):
+    """Represents an inventory item."""
 
-    __tablename__ = 'item'
+    __tablename__ = 'inventory_item'
     __uuid_primary_key__ = True
-    __table_args__ = (db.UniqueConstraint('item_collection_id', 'name'),)
+
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'),
+        nullable=False)
+    organization = db.relationship(Organization,
+        backref=db.backref('inventory_items', cascade='all, delete-orphan'))
+    parent = db.synonym('organization')
+
+    quantity_total = db.Column(db.Integer, default=0, nullable=False)
+    cancellable_until = db.Column(db.DateTime, nullable=True)
+
+    sale_items = db.relationship('SaleItem', secondary=inventory_item_sale_item)
+
+
+class SaleItem(BaseScopedNameMixin, db.Model):
+    """Represents a sale item."""
+
+    __tablename__ = 'sale_item'
+    __uuid_primary_key__ = True
+
+    item_collection_id = db.Column(None, db.ForeignKey('item_collection.id'), nullable=False)
+    item_collection = db.relationship(ItemCollection, backref=db.backref('sale_items', cascade='all, delete-orphan'))
+    parent = db.synonym('item_collection')
+
+    category_id = db.Column(None, db.ForeignKey('category.id'), nullable=False)
+    category = db.relationship(Category, backref=db.backref('sale_items', cascade='all, delete-orphan'))
+
+    inventory_items = db.relationship('InventoryItem', secondary=inventory_item_sale_item)
 
     description = MarkdownColumn('description', default=u'', nullable=False)
     seq = db.Column(db.Integer, nullable=False)
-
-    item_collection_id = db.Column(None, db.ForeignKey('item_collection.id'), nullable=False)
-    item_collection = db.relationship(ItemCollection,
-        backref=db.backref('items', cascade='all, delete-orphan', order_by=seq,
-            collection_class=ordering_list('seq', count_from=1)))
-
-    parent = db.synonym('item_collection')
-
-    categories = db.relationship('Category', secondary=item_category)
-
-    quantity_total = db.Column(db.Integer, default=0, nullable=False)
-
-    cancellable_until = db.Column(db.DateTime, nullable=True)
 
     def current_price(self):
         """Return the current price object for an item."""
@@ -50,33 +60,34 @@ class Item(BaseScopedNameMixin, db.Model):
 
     @classmethod
     def get_by_category(cls, category):
-        return cls.query.filter(Item.category == category).order_by('seq')
-
-    @hybrid_property
-    def quantity_available(self):
-        return self.quantity_total - self.get_confirmed_line_items.count()
+        return cls.query.filter(SaleItem.category == category).order_by('seq')
 
     @property
     def is_available(self):
         """Checks if an item has a current price object and has a positive quantity_available"""
-        return bool(self.current_price() and self.quantity_available > 0)
+        if not self.current_price():
+            return False
+        for inventory_item in self.inventory_items:
+            if self.get_confirmed_line_items.count() >= inventory_item.quantity_total:
+                return False
+        return True
 
 
-class ItemImage(BaseScopedNameMixin, db.Model):
+class Image(BaseScopedNameMixin, db.Model):
     """
     Represents a single image in an item's image collection.
     The image collection can contain exactly one primary image
     """
 
-    __tablename__ = 'item_image'
+    __tablename__ = 'image'
     __uuid_primary_key__ = True
-    __table_args__ = (db.UniqueConstraint('item_id', 'name'),
-        db.UniqueConstraint('item_id', 'primary'))
+    __table_args__ = (db.UniqueConstraint('inventory_item_id', 'name'),
+        db.UniqueConstraint('inventory_item_id', 'primary'))
 
     url = db.Column(db.Unicode(2083), nullable=False)
-    item_id = db.Column(None, db.ForeignKey('item.id'), nullable=False, index=True)
-    item = db.relationship(Item, backref=db.backref('images', cascade='all, delete-orphan'))
-    parent = db.synonym('item')
+    sale_item_id = db.Column(None, db.ForeignKey('sale_item.id'), nullable=False, index=True)
+    sale_item = db.relationship(SaleItem, backref=db.backref('images', cascade='all, delete-orphan'))
+    parent = db.synonym('sale_item')
     primary = db.Column(db.Boolean, nullable=True, default=None)
 
     def set_as_primary(self):
@@ -86,13 +97,13 @@ class ItemImage(BaseScopedNameMixin, db.Model):
 class Price(BaseScopedNameMixin, db.Model):
     __tablename__ = 'price'
     __uuid_primary_key__ = True
-    __table_args__ = (db.UniqueConstraint('item_id', 'name'),
+    __table_args__ = (db.UniqueConstraint('sale_item_id', 'name'),
         db.CheckConstraint('start_at < end_at', 'price_start_at_lt_end_at_check'))
 
-    item_id = db.Column(None, db.ForeignKey('item.id'), nullable=False)
-    item = db.relationship(Item, backref=db.backref('prices', cascade='all, delete-orphan'))
+    sale_item_id = db.Column(None, db.ForeignKey('item.id'), nullable=False)
+    sale_item = db.relationship(SaleItem, backref=db.backref('prices', cascade='all, delete-orphan'))
 
-    parent = db.synonym('item')
+    parent = db.synonym('sale_item')
     start_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     end_at = db.Column(db.DateTime, nullable=False)
 

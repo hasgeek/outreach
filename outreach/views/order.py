@@ -6,7 +6,7 @@ from flask import request, jsonify, make_response
 from coaster.views import load_models
 from .. import app
 from utils import xhr_only, cors
-from ..models import db, LineItem, Item, ItemCollection, User, Order, OrderSession, ORDER_STATUS
+from ..models import db, LineItem, Item, ItemCollection, User, Order, OrderSession
 from ..forms import LineItemForm, BuyerForm, OrderSessionForm
 from outreach.mailclient import send_confirmation_mail
 
@@ -89,7 +89,7 @@ def inquiry(item_collection):
         for idx, line_item_tup in enumerate(line_item_tups):
             item = Item.query.get(line_item_tup.item_id)
             line_item = LineItem(order=order, item=item,
-                line_item_seq=idx+1,
+                seq=idx+1,
                 ordered_at=datetime.utcnow(),
                 base_amount=line_item_tup.base_amount,
                 final_amount=line_item_tup.base_amount)

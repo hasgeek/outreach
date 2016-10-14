@@ -15,7 +15,7 @@ def send_confirmation_mail(order_id, subject="Thank you for your order!"):
     with app.test_request_context():
         order = Order.query.get(order_id)
         msg = Message(subject=subject, recipients=[order.buyer_email], bcc=[order.organization.contact_email])
-        line_items = LineItem.query.filter(LineItem.order == order).order_by("line_item_seq asc").all()
+        line_items = LineItem.query.filter(LineItem.order == order).order_by("seq asc").all()
         html = email_transform(render_template('order_confirmation_mail.html', order=order, org=order.organization, line_items=line_items, base_url=app.config['BASE_URL']))
         msg.html = html
         msg.body = html2text(html)
