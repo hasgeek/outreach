@@ -40,8 +40,8 @@ class LineItem(BaseMixin, db.Model):
         order_by=seq,
         collection_class=ordering_list('seq', count_from=1)))
 
-    item_id = db.Column(None, db.ForeignKey('item.id'), nullable=False, index=True, unique=False)
-    item = db.relationship(SaleItem, backref=db.backref('line_items', cascade='all, delete-orphan'))
+    sale_item_id = db.Column(None, db.ForeignKey('sale_item.id'), nullable=False, index=True, unique=False)
+    sale_item = db.relationship(SaleItem, backref=db.backref('line_items', cascade='all, delete-orphan'))
 
     base_amount = db.Column(db.Numeric, default=Decimal(0), nullable=False)
     final_amount = db.Column(db.Numeric, default=Decimal(0), nullable=False)

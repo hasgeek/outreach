@@ -5,7 +5,7 @@ from decimal import Decimal
 from ..models import db, BaseScopedNameMixin, MarkdownColumn, Organization, ItemCollection, Category
 
 
-__all__ = ['InventoryItem', 'Image', 'Price']
+__all__ = ['InventoryItem', 'SaleItem', 'SaleItemImage', 'Price']
 
 inventory_item_sale_item = db.Table('inventory_item_sale_item', db.Model.metadata,
     db.Column('inventory_item_id', None, db.ForeignKey('inventory_item.id'), primary_key=True),
@@ -73,16 +73,16 @@ class SaleItem(BaseScopedNameMixin, db.Model):
         return True
 
 
-class Image(BaseScopedNameMixin, db.Model):
+class SaleItemImage(BaseScopedNameMixin, db.Model):
     """
     Represents a single image in an item's image collection.
     The image collection can contain exactly one primary image
     """
 
-    __tablename__ = 'image'
+    __tablename__ = 'sale_item_image'
     __uuid_primary_key__ = True
-    __table_args__ = (db.UniqueConstraint('inventory_item_id', 'name'),
-        db.UniqueConstraint('inventory_item_id', 'primary'))
+    __table_args__ = (db.UniqueConstraint('sale_item_id', 'name'),
+        db.UniqueConstraint('sale_item_id', 'primary'))
 
     url = db.Column(db.Unicode(2083), nullable=False)
     sale_item_id = db.Column(None, db.ForeignKey('sale_item.id'), nullable=False, index=True)
@@ -100,7 +100,7 @@ class Price(BaseScopedNameMixin, db.Model):
     __table_args__ = (db.UniqueConstraint('sale_item_id', 'name'),
         db.CheckConstraint('start_at < end_at', 'price_start_at_lt_end_at_check'))
 
-    sale_item_id = db.Column(None, db.ForeignKey('item.id'), nullable=False)
+    sale_item_id = db.Column(None, db.ForeignKey('sale_item.id'), nullable=False)
     sale_item = db.relationship(SaleItem, backref=db.backref('prices', cascade='all, delete-orphan'))
 
     parent = db.synonym('sale_item')

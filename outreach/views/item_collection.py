@@ -3,7 +3,7 @@
 from flask import make_response, render_template, jsonify, request
 from coaster.views import load_models
 from .. import app
-from ..models import ItemCollection, Item
+from ..models import ItemCollection, SaleItem
 from utils import xhr_only, cors
 
 
@@ -29,7 +29,7 @@ def jsonify_item(item):
 
 def jsonify_category(category):
     category_items = []
-    for item in Item.get_by_category(category):
+    for item in SaleItem.get_by_category(category):
         item_json = jsonify_item(item)
         if item_json:
             category_items.append(item_json)

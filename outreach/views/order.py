@@ -6,7 +6,7 @@ from flask import request, jsonify, make_response
 from coaster.views import load_models
 from .. import app
 from utils import xhr_only, cors
-from ..models import db, LineItem, Item, ItemCollection, User, Order, OrderSession
+from ..models import db, LineItem, SaleItem, ItemCollection, User, Order, OrderSession
 from ..forms import LineItemForm, BuyerForm, OrderSessionForm
 from outreach.mailclient import send_confirmation_mail
 
@@ -18,7 +18,7 @@ def jsonify_line_items(line_items):
     """
     items_json = dict()
     for line_item in line_items:
-        item = Item.query.get(line_item.item_id)
+        item = SaleItem.query.get(line_item.item_id)
         if not items_json.get(unicode(line_item.item_id)):
             items_json[unicode(line_item.item_id)] = {'is_available': item.is_available, 'quantity': 0, 'final_amount': Decimal(0)}
         if line_item.base_amount is not None:
@@ -87,7 +87,7 @@ def inquiry(item_collection):
             for li_form in line_item_forms
                 for x in range(li_form.data.get('quantity'))])
         for idx, line_item_tup in enumerate(line_item_tups):
-            item = Item.query.get(line_item_tup.item_id)
+            item = SaleItem.query.get(line_item_tup.item_id)
             line_item = LineItem(order=order, item=item,
                 seq=idx+1,
                 ordered_at=datetime.utcnow(),

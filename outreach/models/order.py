@@ -50,7 +50,7 @@ class Order(BaseMixin, db.Model):
     status = db.Column(db.Integer, default=ORDER_STATUS.PURCHASE_ORDER, nullable=False)
 
     initiated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    inquired_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    inquired_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
     paid_at = db.Column(db.DateTime, nullable=True)
     invoiced_at = db.Column(db.DateTime, nullable=True)
     cancelled_at = db.Column(db.DateTime, nullable=True)
