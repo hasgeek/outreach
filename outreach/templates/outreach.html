@@ -18,96 +18,96 @@
           <i class="fa fa-shopping-cart"></i>
         </button>
         
-        <div class="proceed-button-wrapper">
-          <button class="boxoffice-button boxoffice-button-info" on-click="getContactDetails(event)">
-            <i class="fa fa-phone"></i> Talk to us
-          </button>
-        </div>
+        <button class="boxoffice-button boxoffice-button-info contact-btn" on-click="getContactDetails(event)">
+          <i class="fa fa-phone"></i> Talk to us
+        </button>
 
-        {{#section.categories}}
-          <div id="{{name}}" class="categories">
-            <div>
-              <h1 class="category-heading">{{title}}</h1>
-            </div>
-            {{#description}}
-              <div class="category-description">{{{ description }}}</div>
-            {{/}}
-            <div class="category-items">
-            {{#items}}{{# { item: . } }}
-              {{#order.line_items}} {{# { line_item: . } }}
-                {{#if line_item.item_name === item.name }}
-                  <div class="card clearfix {{#line_item.quantity}}ticket-selected{{/}}" id="{{line_item.item_name}}">
-                    <div class="ticket-details-right">
-                      {{#if line_item.item_image}}
-                        <div class="ticket-image">
-                          <img src="{{line_item.item_image.url}}" alt="{{line_item.item_image.title}}">
-                        </div>
-                      {{else}}
-                        <div class="org-logo">
-                          <img src="{{order.org_logo}}" alt="{{order.org_name}}">
-                        </div>
-                      {{/if}}
-
-                      <div class="ticket-price-qty clearfix">
-                        {{#if line_item.is_available}}
-                          {{#if line_item.quantity_available < 5}}
-                            <p class="few-ticket">
-                              <span class="available-count">Only {{line_item.quantity_available}} available</span>
-                            </p>
-                          {{/if}}
-                          {{#if line_item.quantity > 0}}
-                            <div class="price-details-wrapper" outro='fly:{"x":10,"y":0,"duration":100}'>
-                              <div class="ticket-qty-wrapper">
-                                <button class="decrement" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)">-</button>
-                                <input type="number" class="ticket-qty" name="quantity" min="0" max="{{ line_item.quantity_available }}" value="{{ line_item.quantity }}" disabled>
-                                <button class="increment" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">+</button>
-                              </div>
-                            </div>
-                          {{else}}
-                            <div>
-                              <button class="boxoffice-button boxoffice-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">I am interested</button>
-                            </div>
-                          {{/if}}
-                          <div class="item-amount">
-                            {{#line_item.discounted_amount && !isLoadingFail}}
-                              <p intro-outro='fly:{"x":10,"y":"0"}' class="discount-amount">Discount <span>{{formatToIndianRupee(line_item.discounted_amount)}}</span></p>
-                            {{/}}
-                            {{#line_item.discounted_amount || line_item.final_amount && !isLoadingFail}}
-                              <p intro-outro='fly:{"x":10,"y":"0"}' class="subtotal">Subtotal <span>{{formatToIndianRupee(line_item.final_amount)}}</span></p>
-                            {{/}}
+        <div class="inventory-wrapper">
+          {{#section.categories}}
+            <div id="{{name}}" class="categories">
+              <div class="category-title">
+                <h1 class="category-heading">{{title}}</h1>
+                {{#description}}
+                  <div class="category-description">{{{ description }}}</div>
+                {{/}}
+              </div>
+              <div class="category-items">
+              {{#items}}{{# { item: . } }}
+                {{#order.line_items}} {{# { line_item: . } }}
+                  {{#if line_item.item_name === item.name }}
+                    <div class="card clearfix {{#line_item.quantity}}ticket-selected{{/}}" id="{{line_item.item_name}}">
+                      <div class="ticket-details-right">
+                        {{#if line_item.item_image}}
+                          <div class="ticket-image">
+                            <img src="{{line_item.item_image.url}}" alt="{{line_item.item_image.title}}">
                           </div>
                         {{else}}
-                          <div class="sold-out-wrapper" intro='fly:{"x":100,"y":0}'>
-                            <p class="sold-out">Sold out</p>
+                          <div class="org-logo">
+                            <img src="{{order.org_logo}}" alt="{{order.org_name}}">
                           </div>
                         {{/if}}
-                      </div>
-                    </div>
 
-                    <div class="ticket-details-left">
-                      <p class="ticket-title">{{ line_item.item_title }}</p>
-                      <div class="ticket-price-wrapper">
-                        {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}
-                          <p class="discount-price ticket-price">{{ formatToIndianRupee(line_item.unit_final_amount) }}</p>
-                        {{/if}}
-                        <p class="ticket-price {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}strike{{/if}}">{{ formatToIndianRupee(line_item.base_price) }}</p>
+                        <div class="ticket-price-qty clearfix">
+                          {{#if line_item.is_available}}
+                            {{#if line_item.quantity_available < 5}}
+                              <p class="few-ticket">
+                                <span class="available-count">Only {{line_item.quantity_available}} available</span>
+                              </p>
+                            {{/if}}
+                            {{#if line_item.quantity > 0}}
+                              <div class="price-details-wrapper" outro='fly:{"x":10,"y":0,"duration":100}'>
+                                <div class="ticket-qty-wrapper">
+                                  <button class="decrement" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)">-</button>
+                                  <input type="number" class="ticket-qty" name="quantity" min="0" max="{{ line_item.quantity_available }}" value="{{ line_item.quantity }}" disabled>
+                                  <button class="increment" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">+</button>
+                                </div>
+                              </div>
+                            {{else}}
+                              <div>
+                                <button class="boxoffice-button boxoffice-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">I am interested</button>
+                              </div>
+                            {{/if}}
+                            <div class="item-amount">
+                              {{#line_item.discounted_amount && !isLoadingFail}}
+                                <p intro-outro='fly:{"x":10,"y":"0"}' class="discount-amount">Discount <span>{{formatToIndianRupee(line_item.discounted_amount)}}</span></p>
+                              {{/}}
+                              {{#line_item.discounted_amount || line_item.final_amount && !isLoadingFail}}
+                                <p intro-outro='fly:{"x":10,"y":"0"}' class="subtotal">Subtotal <span>{{formatToIndianRupee(line_item.final_amount)}}</span></p>
+                              {{/}}
+                            </div>
+                          {{else}}
+                            <div class="sold-out-wrapper" intro='fly:{"x":100,"y":0}'>
+                              <p class="sold-out">Sold out</p>
+                            </div>
+                          {{/if}}
+                        </div>
                       </div>
-                      <div class="ticket-description">{{{ line_item.item_description }}}</div>
-                      {{#line_item.discount_policies}}
-                        {{#if is_automatic || activated || pre_applied }}
-                          <p class="discount {{#activated}}applied{{/}}">
-                             {{ title }} <i class="fa fa-check {{#if !activated && !isLoadingFail}}hidden{{/if}}"></i>
-                          </p>
-                        {{/if}}
-                      {{/line_item.discount_policies}}
+
+                      <div class="ticket-details-left">
+                        <p class="ticket-title">{{ line_item.item_title }}</p>
+                        <div class="ticket-price-wrapper">
+                          {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}
+                            <p class="discount-price ticket-price">{{ formatToIndianRupee(line_item.unit_final_amount) }}</p>
+                          {{/if}}
+                          <p class="ticket-price {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}strike{{/if}}">{{ formatToIndianRupee(line_item.base_price) }}</p>
+                        </div>
+                        <div class="ticket-description">{{{ line_item.item_description }}}</div>
+                        {{#line_item.discount_policies}}
+                          {{#if is_automatic || activated || pre_applied }}
+                            <p class="discount {{#activated}}applied{{/}}">
+                               {{ title }} <i class="fa fa-check {{#if !activated && !isLoadingFail}}hidden{{/if}}"></i>
+                            </p>
+                          {{/if}}
+                        {{/line_item.discount_policies}}
+                      </div>
                     </div>
-                  </div>
-                {{/if}}
-              {{/}}{{/order.line_items}}
-            {{/}}{{/items}}
+                  {{/if}}
+                {{/}}{{/order.line_items}}
+              {{/}}{{/items}}
+              </div>
             </div>
-          </div>
-        {{/section.categories}}
+          {{/section.categories}}
+        </div>
 
         <div class="cart-content {{#cartSideBarOpen}}cart-open{{/}}" on-click="openCart(event, false)">
           <div class="cart-body clearfix">
@@ -392,76 +392,94 @@
     position: relative;
   }
   .boxoffice-section {
-    padding: 40px 20px;
+    padding: 15px 15px 0;
     border: 2px solid #ccc;
     border-top-width: 0;
     min-height: 450px;
   }
+  .contact-btn {
+    margin: 0 0 15px;
+    float: right;
+  }
+  @media (min-width: 768px) {
+    .contact-btn {
+      position: absolute;
+      float: none;
+      top: 20px;
+      right: 20px;
+    }
+  }
   .categories {
     clear: both;
+    margin: 0 0 15px;
   }
   .category-heading {
-    background-color: #ccc;
     border-bottom: 3px solid #aaa;
     color: #333;
     position: relative;
     font-size: 18px;
     width: 100%;
-    margin: 0 0 0 -22px;
-    padding: 10px 20px;
+    margin: 10px 0;
+    padding: 10px 0;
     z-index: 1;
     text-transform: uppercase;
-  }
-  .category-heading:after {
-    content: "";
-    display: block;
-    position: absolute;
-    right: 0px;
-    top: 0px;
-    border-style: solid;
-    border-color: #CCC transparent #CCC #CCC;
-    border-width: 19px;
-    z-index: 2;
-    background-color: transparent;
   }
   @media (min-width: 480px) {
     .category-heading {
       font-size: 20px;
-      width: 55%;
-    }
-    .category-heading:after {
-      border-width: 21px;
     }
   }
   .category-description {
     font-size: 15px;
     text-align: left;
-    margin: 15px 0 0;
+    margin: 15px 0 0 0;
+    line-height: 1.65em;
   }
   @media (min-width: 768px) {
+    .categories {
+      display: -webkit-flex;
+      display: flex;
+      margin: 15px 0 0 -15px;
+    }
+    .inventory-wrapper div.categories:first-child {
+      margin-top: -15px;
+    }
+    .category-title {
+      width: 380px;
+      background-color: #eee;
+    }
+    .category-heading {
+      padding: 25px 15px;
+    }
     .category-description {
-      width: 55%;
+      padding: 10px 15px;
     }
   }
-  .category-items {
-    text-align: center;
+  @media (min-width: 768px) {
+    .category-items {
+      margin-top: 70px;
+    }
   }
   .card {
     display: inline-block;
     vertical-align: top;
     float: none;
-    margin-bottom: 40px;
     background-color: #fff;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
     border-radius: 5px;
     background-color: #fff;
     min-height: 196px;
-    margin: 25px 0;
+    margin: 15px 0;
   }
   @media (min-width: 768px) {
     .card {
+      margin: 15px 0 15px 15px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .card {
       width: 48%;
-      margin: 25px 1%;
+      margin: 15px 0 15px 2%;
     }
   }
   .ticket-selected {
@@ -472,6 +490,7 @@
     word-break: break-word;
     width: 50%;
     padding: 15px;
+    text-align: left;
   }
   .ticket-details-right {
     float: right;
@@ -495,6 +514,7 @@
     border-radius: 5px;
     border: 1px solid #ccc;
     overflow: hidden;
+    margin: 14px 0px;
   }
   .org-logo {
     width: 50%;
@@ -526,13 +546,18 @@
   .ticket-description p {
     margin: 7px 0;
   }
+  .ticket-description ul {
+    padding: 0 15px;
+    margin: 0;
+  }
   .ticket-description .fa {
     padding-right: 5px;
   }
   .few-ticket {
     font-size: 13px;
     font-style: italic;
-    margin: 0 0 5px;
+    margin: 0 15px 5px;
+    text-align: left;
   }
   .available-count {
     color: #e42c42;
@@ -639,16 +664,9 @@
     font-weight: bold;
   }
   @media (min-width: 600px) and (max-width: 1023px) {
-    .category-heading {
-      font-size: 30px;
-    }
-    .category-heading:after {
-      border-width: 26px;
-    }
     .ticket-title,
     .ticket-price,
-    .multiplier,
-    .ticket-qty {
+    .multiplier {
      font-size: 25px;
     }
     .sold-out {
@@ -659,7 +677,10 @@
     .ticket-price .rupee-sign {
       font-size: 22px;
     }
-    .increment, .decrement {
+    .ticket-qty-wrapper {
+      width: 102px;
+    }
+    .increment, .decrement, .ticket-qty {
       font-size: 35px;
     }
     .ticket-qty-wrapper {
