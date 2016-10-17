@@ -55,7 +55,7 @@ $(function() {
     return [];
   };
 
-  boxoffice.util.getUtmHeaders = function(param){
+  boxoffice.util.getUtmHeaders = function(){
     /*
     Checks for utm_* headers and returns a hash with the headers set to values.
     If a header occurs more than once, the values are joined to form a single comma-separated string
@@ -78,7 +78,7 @@ $(function() {
     });
     utm_values['referrer'] = document.referrer;
     return utm_values;
-  }
+  };
 
   boxoffice.util.formatDateTime = function(valid_upto) {
     // Returns date in the format 00:00:00 AM, Sun Apr 10 2016
@@ -147,7 +147,7 @@ $(function() {
     'Inquiry': 0,
     'PurchaseOrder': 1,
     'SalesOrder': 2
-  }
+  };
 
   boxoffice.init = function(widgetConfig) {
     // Config variables provided by the client embedding the widget
@@ -221,7 +221,7 @@ $(function() {
             },
             payment: {
               id: 'boxoffice-payment',
-              label: 'Payment',
+              label: 'Details',
               complete: false,
               section: {
               },
@@ -242,6 +242,15 @@ $(function() {
             return line_items.reduce(function(previousline_item, currentline_item) {
               return {quantity: previousline_item.quantity + currentline_item.quantity};
             }).quantity;
+          },
+          truncateDescription: function(description) {
+            var max_character_count = 200;
+            if (description.length < max_character_count) {
+              return description;
+            }
+            else {
+              return description.slice(0, max_character_count) + '<span>...</span>';
+            }
           },
           formatToIndianRupee: function(value) {
             // Takes a floating point value and formats it to the Indian currency format
@@ -271,12 +280,13 @@ $(function() {
         openCart: function(event, action) {
           event.original.preventDefault();
           boxoffice.ractive.set('cartSideBarOpen', action);
+          var body;
           if(action) {
-            var body = document.getElementsByTagName("body")[0];
+            body = document.getElementsByTagName("body")[0];
             body.style.overflow = "hidden";
           }
           else {
-            var body = document.getElementsByTagName("body")[0];
+            body = document.getElementsByTagName("body")[0];
             body.style.overflow = "";
           }
         },
@@ -288,6 +298,17 @@ $(function() {
           boxoffice.ractive.set('cartSideBarOpen', false);
           boxoffice.ractive.set('activeTab', boxoffice.ractive.get('tabs.selectItems.id'));
           boxoffice.ractive.scrollTop();
+        },
+        expandText: function(event, item_name, action) {
+          // Expand or collapse description text of an item
+          event.original.preventDefault();
+          var lineItems = boxoffice.ractive.get('order.line_items');
+          lineItems.forEach(function(lineItem) {
+            if (lineItem.item_name === item_name) {
+              lineItem.expand = action;
+            }
+          });
+          boxoffice.ractive.set('order.line_items', lineItems);
         },
         updateOrder: function(event, item_name, quantityAvailable, increment) {
           // Increments or decrements a line item's quantity

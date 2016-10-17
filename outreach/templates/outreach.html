@@ -36,7 +36,13 @@
                 {{#order.line_items}} {{# { line_item: . } }}
                   {{#if line_item.item_name === item.name }}
                     <div class="card clearfix {{#line_item.quantity}}ticket-selected{{/}}" id="{{line_item.item_name}}">
-                      <div class="ticket-details-right">
+
+                      <div class="ticket-details">
+                        <p class="ticket-title">{{ line_item.item_title }}</p>
+                        <div class="ticket-price-wrapper">
+                          <p class="ticket-price {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}strike{{/if}}">{{ formatToIndianRupee(line_item.base_price) }}</p>
+                        </div>
+
                         {{#if line_item.item_image}}
                           <div class="ticket-image">
                             <img src="{{line_item.item_image.url}}" alt="{{line_item.item_image.title}}">
@@ -46,6 +52,16 @@
                             <img src="{{order.org_logo}}" alt="{{order.org_name}}">
                           </div>
                         {{/if}}
+
+                        <div class="ticket-description">
+                          {{#if !expand}}
+                            {{{ truncateDescription(line_item.item_description) }}}
+                            <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, true)"><i class="fa fa-caret-down"></i> Read More</a>
+                          {{else}}
+                            {{{ line_item.item_description }}}
+                            <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, false)"><i class="fa fa-caret-up"></i> Close</a>
+                          {{/if}}
+                        </div>
 
                         <div class="ticket-price-qty clearfix">
                           {{#if line_item.is_available}}
@@ -63,15 +79,12 @@
                                 </div>
                               </div>
                             {{else}}
-                              <div>
+                              <div class="add-item-btn">
                                 <button class="boxoffice-button boxoffice-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">I am interested</button>
                               </div>
                             {{/if}}
                             <div class="item-amount">
-                              {{#line_item.discounted_amount && !isLoadingFail}}
-                                <p intro-outro='fly:{"x":10,"y":"0"}' class="discount-amount">Discount <span>{{formatToIndianRupee(line_item.discounted_amount)}}</span></p>
-                              {{/}}
-                              {{#line_item.discounted_amount || line_item.final_amount && !isLoadingFail}}
+                              {{#line_item.final_amount && !isLoadingFail}}
                                 <p intro-outro='fly:{"x":10,"y":"0"}' class="subtotal">Subtotal <span>{{formatToIndianRupee(line_item.final_amount)}}</span></p>
                               {{/}}
                             </div>
@@ -82,30 +95,15 @@
                           {{/if}}
                         </div>
                       </div>
-
-                      <div class="ticket-details-left">
-                        <p class="ticket-title">{{ line_item.item_title }}</p>
-                        <div class="ticket-price-wrapper">
-                          {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}
-                            <p class="discount-price ticket-price">{{ formatToIndianRupee(line_item.unit_final_amount) }}</p>
-                          {{/if}}
-                          <p class="ticket-price {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}strike{{/if}}">{{ formatToIndianRupee(line_item.base_price) }}</p>
-                        </div>
-                        <div class="ticket-description">{{{ line_item.item_description }}}</div>
-                        {{#line_item.discount_policies}}
-                          {{#if is_automatic || activated || pre_applied }}
-                            <p class="discount {{#activated}}applied{{/}}">
-                               {{ title }} <i class="fa fa-check {{#if !activated && !isLoadingFail}}hidden{{/if}}"></i>
-                            </p>
-                          {{/if}}
-                        {{/line_item.discount_policies}}
-                      </div>
-                    </div>
+                    <div>
                   {{/if}}
                 {{/}}{{/order.line_items}}
               {{/}}{{/items}}
               </div>
             </div>
+            {{#if @index < section.categories.length-1}}
+              <hr class="separator thick">
+            {{/if}}
           {{/section.categories}}
         </div>
 
@@ -121,14 +119,6 @@
                   <li class="item-summary">
                     <span class="booked-ticket-title">{{ line_item.item_title }}</span>
                     <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
-                    {{#line_item.discounted_amount}}
-                      <p class="booked-ticket-qty">Discount {{ formatToIndianRupee(line_item.discounted_amount) }}</p>
-                    {{/line_item.discounted_amount}}
-                    {{#line_item.discount_policies}}
-                      {{#if activated}}
-                      <p class="discount-applied">Applied {{ title }}</p>
-                      {{/if}}
-                    {{/line_item.discount_policies}}
                     <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
                   </li>
                 {{/if}}
@@ -215,14 +205,6 @@
                     <li class="item-summary">
                       <span class="booked-ticket-title">{{ line_item.item_title }}</span>
                       <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
-                      {{#line_item.discounted_amount}}
-                        <p class="booked-ticket-qty">Discount {{ formatToIndianRupee(line_item.discounted_amount) }}</p>
-                      {{/line_item.discounted_amount}}
-                      {{#line_item.discount_policies}}
-                        {{#if activated}}
-                        <p class="discount-applied">Applied {{ title }}</p>
-                        {{/if}}
-                      {{/line_item.discount_policies}}
                       <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
                     </li>
                   {{/if}}
@@ -405,8 +387,8 @@
     .contact-btn {
       position: absolute;
       float: none;
-      top: 20px;
-      right: 20px;
+      top: 27px;
+      right: 15px;
     }
   }
   .categories {
@@ -419,14 +401,19 @@
     position: relative;
     font-size: 18px;
     width: 100%;
-    margin: 10px 0;
-    padding: 10px 0;
+    margin: 15px 0;
+    padding: 0 0 15px;
     z-index: 1;
     text-transform: uppercase;
   }
   @media (min-width: 480px) {
     .category-heading {
       font-size: 20px;
+    }
+  }
+  @media (min-width: 768px) {
+    .category-heading {
+      font-size: 30px;
     }
   }
   .category-description {
@@ -439,25 +426,26 @@
     .categories {
       display: -webkit-flex;
       display: flex;
-      margin: 15px 0 0 -15px;
+      margin: -1px 0 0 -15px;
     }
     .inventory-wrapper div.categories:first-child {
       margin-top: -15px;
     }
     .category-title {
-      width: 380px;
+      min-width: 320px;
+      width: 320px;
       background-color: #eee;
     }
     .category-heading {
-      padding: 25px 15px;
+      padding: 15px;
     }
     .category-description {
-      padding: 10px 15px;
+      padding: 0 15px;
     }
   }
   @media (min-width: 768px) {
     .category-items {
-      margin-top: 70px;
+      margin-top: 80px;
     }
   }
   .card {
@@ -485,22 +473,12 @@
   .ticket-selected {
     background-color: #f7f6ec;
   }
-  .ticket-details-left {
-    float: left;
-    word-break: break-word;
-    width: 50%;
-    padding: 15px;
-    text-align: left;
-  }
-  .ticket-details-right {
-    float: right;
-    word-break: break-word;
-    width: 50%;
-    padding: 15px;
+  .ticket-details {
+    padding: 0 15px 15px;
   }
   .ticket-title {
     font-size: 18px;
-    margin: 10px 0;
+    margin: 15px 0;
     color: #428bca;
   }
   @media (min-width: 768px) {
@@ -514,7 +492,7 @@
     border-radius: 5px;
     border: 1px solid #ccc;
     overflow: hidden;
-    margin: 14px 0px;
+    margin: 15px 0px;
   }
   .org-logo {
     width: 50%;
@@ -523,21 +501,6 @@
   .ticket-image img,
   .org-logo img {
     width: 100%;
-  }
-  .discount {
-    font-size: 15px;
-    margin: 5px 0;
-    font-style: italic;
-    color: #e42c42;
-    text-align: left;
-  }
-  .discount.applied {
-    color: #008000;
-  }
-  .valid-upto {
-    font-size: 12px;
-    font-style: italic;
-    margin: 5px 0;
   }
   .ticket-description {
     font-size: 15px;
@@ -553,17 +516,27 @@
   .ticket-description .fa {
     padding-right: 5px;
   }
+  .js-read-more {
+    color: #428bca;
+    text-decoration: none;
+    border: 0;
+    margin: 5px 0;
+    display: inline-block;
+  }
   .few-ticket {
     font-size: 13px;
     font-style: italic;
-    margin: 0 15px 5px;
-    text-align: left;
+    margin: 0 0 5px;
+    text-align: center;
   }
   .available-count {
     color: #e42c42;
   }
+  .add-item-btn {
+    text-align: center;
+  }
   .ticket-price-qty {
-    margin-top: 20px;
+    margin-top: 15px;
     width: 100%;
   }
   .price-details-wrapper {
@@ -580,16 +553,6 @@
   .ticket-price .rupee-sign {
     font-size: 16px;
   }
-  .discount-price {
-    position: absolute;
-    bottom: 23px;
-    padding: 0;
-    line-height: 1;
-  }
-  .strike {
-    text-decoration: line-through;
-    color: #aaa;
-  }
   .ticket-qty-wrapper {
     border: 1px solid #CCC;
     border-radius: 4px;
@@ -601,7 +564,7 @@
     background: #f6f3c2;
     font-size: 18px;
     width: 80px;
-    margin: auto;
+    margin: 0 auto;
   }
   .ticket-qty {
     width: 32px;
@@ -648,7 +611,7 @@
     margin-top: 2px;
     float: right;
   }
-  .discount-amount, .subtotal {
+  .subtotal {
     margin: 5px 0;
   }
   .sold-out {
@@ -690,14 +653,8 @@
       top: -4px;
       width: 40px;
     }
-    .discount-price {
-      bottom: 34px;
-    }
   }
   @media (min-width: 1024px) {
-    .discount-price {
-      bottom: 24px;
-    }
     .ticket-price-wrapper {
       margin-top: 2px;
     }
@@ -707,6 +664,7 @@
     font-size: 15px;
     color: #888;
     margin: 10px auto 0;
+    text-align: center;
   }
   .item-amount .rupee-sign {
     font-size: 13px;
@@ -717,6 +675,10 @@
     margin: 0 -20px 20px;
     border: 0;
     border-top: 1px solid #eee;
+  }
+  .boxoffice-section .separator.thick {
+    border-top: 3px solid #ccc;
+    margin: 0 -15px 0;
   }
   .cart-btn {
     position: fixed;
@@ -956,11 +918,6 @@
   .checkout-confirmation {
     padding: 0;
   }
-  @media(min-width: 768px) {
-    .checkout-confirmation {
-      padding: 0px 15px;
-    }
-  }
   .item-summary {
     border-bottom: 1px dotted #CCC;
     padding: 5px 0;
@@ -971,17 +928,13 @@
   .booked-ticket-title .fa-ticket {
     padding-right: 10px;
   }
-  .booked-ticket-qty,  
-  .discount-applied {
+  .booked-ticket-qty{
     font-size: 13px;
     text-align: right;
     margin: 5px 0;
   }
   .booked-ticket-qty .rupee-sign {
     font-size: 11px;
-  }
-  .discount-applied {
-    color: green;
   }
   .final-amount{
     float: right;
