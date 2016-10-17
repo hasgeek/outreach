@@ -6,14 +6,15 @@ import baseframe.forms as forms
 __all__ = ['LineItemForm', 'BuyerForm', 'OrderSessionForm']
 
 
-def trim(length):
+def truncate(length):
     """
-    Returns data trimmed to the given length. To be used as part of the filters argument.
+    Return a function that truncates data to the given length.
+    To be used as part of the filters argument.
     Eg:
     field = forms.StringField(__("Some field"), filters=[trim(25)])
     """
     def _inner(data):
-        return unicode(data[0:length])
+        return unicode(data[:length])
     return _inner
 
 
@@ -49,11 +50,11 @@ class BuyerForm(forms.Form):
 
 
 class OrderSessionForm(forms.Form):
-    utm_campaign = forms.StringField(__("UTM Campaign"), filters=[trim(250)])
-    utm_source = forms.StringField(__("UTM Source"), filters=[trim(250)])
-    utm_medium = forms.StringField(__("UTM Medium"), filters=[trim(250)])
-    utm_term = forms.StringField(__("UTM Term"), filters=[trim(250)])
-    utm_content = forms.StringField(__("UTM Content"), filters=[trim(250)])
-    utm_id = forms.StringField(__("UTM Id"), filters=[trim(250)])
-    gclid = forms.StringField(__("Gclid"), filters=[trim(250)])
-    referrer = forms.StringField(__("Referrer"), filters=[trim(2083)])
+    utm_campaign = forms.StringField(__("UTM Campaign"), filters=[truncate(250)])
+    utm_source = forms.StringField(__("UTM Source"), filters=[truncate(250)])
+    utm_medium = forms.StringField(__("UTM Medium"), filters=[truncate(250)])
+    utm_term = forms.StringField(__("UTM Term"), filters=[truncate(250)])
+    utm_content = forms.StringField(__("UTM Content"), filters=[truncate(250)])
+    utm_id = forms.StringField(__("UTM Id"), filters=[truncate(250)])
+    gclid = forms.StringField(__("Gclid"), filters=[truncate(250)])
+    referrer = forms.StringField(__("Referrer"), filters=[truncate(2083)])
