@@ -12,9 +12,7 @@ pytz
 psycopg2
 wtforms_json
 rq
-itsdangerous
 html2text
 premailer
 python-dateutil
-tabulate
 Flask-Admin
