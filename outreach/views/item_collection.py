@@ -18,7 +18,6 @@ def jsonify_item(item):
             'description': item.description.text,
             'quantity_available': item.quantity_available,
             'is_available': item.is_available,
-            'quantity_total': item.quantity_total,
             'category_id': item.category_id,
             'item_collection_id': item.item_collection_id,
             'price': price.amount,

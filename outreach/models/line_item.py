@@ -92,7 +92,7 @@ class LineItem(BaseMixin, db.Model):
 
 def get_confirmed_line_items(self):
     """Returns a SQLAlchemy query object preset with an item's confirmed line items"""
-    return LineItem.query.filter(LineItem.item == self, LineItem.status == LINE_ITEM_STATUS.CONFIRMED)
+    return LineItem.query.filter(LineItem.sale_item == self, LineItem.status == LINE_ITEM_STATUS.CONFIRMED)
 
 
 SaleItem.get_confirmed_line_items = property(get_confirmed_line_items)

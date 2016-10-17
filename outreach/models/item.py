@@ -55,7 +55,7 @@ class SaleItem(BaseScopedNameMixin, db.Model):
 
     def price_at(self, timestamp):
         """Return the price object for an item at a given time."""
-        return Price.query.filter(Price.item == self, Price.start_at <= timestamp,
+        return Price.query.filter(Price.sale_item == self, Price.start_at <= timestamp,
             Price.end_at > timestamp).order_by('created_at desc').first()  # noqa
 
     @classmethod
@@ -71,6 +71,12 @@ class SaleItem(BaseScopedNameMixin, db.Model):
             if self.get_confirmed_line_items.count() >= inventory_item.quantity_total:
                 return False
         return True
+
+    @property
+    def quantity_available(self):
+        min_quantity_available = min([inventory_item.quantity_total - self.get_confirmed_line_items.count()
+            for inventory_item in self.inventory_items])
+        return min_quantity_available if min_quantity_available > 0 else 0
 
 
 class SaleItemImage(BaseScopedNameMixin, db.Model):
