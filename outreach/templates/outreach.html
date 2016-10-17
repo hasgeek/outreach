@@ -194,6 +194,12 @@
             <label class="group-label">Phone</label>
             {{#errormsg.phone}}<p class="form-error-msg">{{ errormsg.phone }}</p>{{/}}
           </div>
+          <div class="group">
+            <input class="group-input {{#buyer.company}}filled{{/}}" type="text" name="company" value="{{buyer.company}}">
+            <span class="bar"></span>
+            <label class="group-label">Company</label>
+            {{#errormsg.company}}<p class="form-error-msg">{{ errormsg.company }}</p>{{/}}
+          </div>
 
           {{#if getLineItemsLength(order.line_items) > 0}}
             <div class="checkout-confirmation">

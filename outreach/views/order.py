@@ -77,6 +77,7 @@ def inquiry(item_collection):
         item_collection=item_collection,
         buyer_email=buyer_form.email.data,
         buyer_fullname=buyer_form.fullname.data,
+        buyer_company=buyer_form.company.data,
         buyer_phone=buyer_form.phone.data)
 
     order.register_inquiry()
@@ -88,7 +89,7 @@ def inquiry(item_collection):
                 for x in range(li_form.data.get('quantity'))])
         for idx, line_item_tup in enumerate(line_item_tups):
             item = SaleItem.query.get(line_item_tup.item_id)
-            line_item = LineItem(order=order, item=item,
+            line_item = LineItem(order=order, sale_item=item,
                 seq=idx+1,
                 ordered_at=datetime.utcnow(),
                 base_amount=line_item_tup.base_amount,
