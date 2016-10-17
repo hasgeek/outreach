@@ -12,7 +12,7 @@ class OrganizationModelView(SiteAdminModelView):
     column_display_pk = True
     column_list = ('id', 'title')
     form_list = ('id', 'userid', 'title')
-    form_excluded_columns = ['userid', 'item_collections', 'discount_policies', 'orders', 'created_at', 'updated_at']
+    form_excluded_columns = ['userid', 'item_collections', 'orders', 'created_at', 'updated_at']
 
 
 class OrderModelView(SiteAdminModelView):
@@ -39,7 +39,16 @@ class CategoryModelView(SiteAdminModelView):
     form_excluded_columns = ['parent', 'items', 'created_at', 'updated_at']
 
 
-class ItemModelView(SiteAdminModelView):
+class InventoryItemModelView(SiteAdminModelView):
+    can_delete = False
+    column_display_pk = True
+    column_filters = ['organization']
+    column_searchable_list = ['title']
+    column_list = ('id', 'title')
+    form_excluded_columns = ['parent', 'line_items', 'created_at', 'updated_at']
+
+
+class SaleItemModelView(SiteAdminModelView):
     can_delete = False
     column_display_pk = True
     column_filters = ['item_collection']
@@ -48,34 +57,17 @@ class ItemModelView(SiteAdminModelView):
     form_excluded_columns = ['parent', 'line_items', 'created_at', 'updated_at']
 
 
-class ItemImageView(SiteAdminModelView):
+class SaleItemImageView(SiteAdminModelView):
     can_delete = False
     column_display_pk = True
-    column_filters = ['item']
-    column_list = ('item', 'url')
+    column_filters = ['sale_item']
+    column_list = ('sale_item', 'url')
     form_excluded_columns = ['parent', 'primary', 'created_at', 'updated_at']
 
 
 class PriceModelView(SiteAdminModelView):
     can_delete = False
     column_display_pk = True
-    column_filters = ['item']
-    column_list = ('id', 'item', 'title', 'start_at', 'end_at', 'currency', 'amount')
+    column_filters = ['sale_item']
+    column_list = ('id', 'sale_item', 'title', 'start_at', 'end_at', 'currency', 'amount')
     form_excluded_columns = ['parent', 'created_at', 'updated_at']
-
-
-class DiscountPolicyModelView(SiteAdminModelView):
-    can_delete = False
-    column_display_pk = True
-    column_filters = ['organization']
-    column_list = ('id', 'title')
-    column_searchable_list = ['title']
-    form_excluded_columns = ['parent', 'line_items', 'created_at', 'updated_at', 'discount_coupons']
-
-
-class DiscountCouponModelView(SiteAdminModelView):
-    can_delete = False
-    column_filters = ['discount_policy']
-    column_searchable_list = ['code']
-    column_list = ('code', 'discount_policy')
-    form_excluded_columns = ['line_items', 'created_at', 'updated_at']
