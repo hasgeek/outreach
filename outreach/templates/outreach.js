@@ -299,7 +299,7 @@ $(function() {
           boxoffice.ractive.set('activeTab', boxoffice.ractive.get('tabs.selectItems.id'));
           boxoffice.ractive.scrollTop();
         },
-        expandText: function(item_name, action) {
+        expandText: function(event, item_name, action) {
           // Expand or collapse description text of an item
           event.original.preventDefault();
           var lineItems = boxoffice.ractive.get('order.line_items');
