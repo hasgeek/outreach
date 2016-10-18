@@ -100,6 +100,10 @@ class SaleItemImage(BaseScopedNameMixin, db.Model):
     parent = db.synonym('sale_item')
     primary = db.Column(db.Boolean, nullable=True, default=None)
 
+    @classmethod
+    def get_primary(cls, sale_item):
+        return cls.query.filter(cls.sale_item == sale_item, cls.primary == True).one_or_none()
+
     def set_as_primary(self):
         self.primary = True
 

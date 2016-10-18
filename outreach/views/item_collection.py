@@ -3,18 +3,19 @@
 from flask import make_response, render_template, jsonify, request
 from coaster.views import load_models
 from .. import app
-from ..models import ItemCollection, SaleItem
+from ..models import ItemCollection, SaleItem, SaleItemImage
 from utils import xhr_only, cors
 
 
 def jsonify_item(item):
     price = item.current_price()
     if price:
+        primary_image = SaleItemImage.get_primary(item)
         return {
             'name': item.name,
             'title': item.title,
             'id': item.id,
-            'image': {'url': item.images[0].url, 'title': item.images[0].title} if item.images else None,
+            'image': {'url': primary_image.url, 'title': primary_image.title} if primary_image else None,
             'description': item.description.text,
             'quantity_available': item.quantity_available,
             'is_available': item.is_available,
