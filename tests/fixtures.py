@@ -25,9 +25,9 @@ def init_data():
     db.session.add(rc2016)
     db.session.commit()
 
-    day1 = InventoryItem(title='day1', organization=hasgeek, quantity_total=1000)
+    day1 = InventoryItem(title='day1', item_collection=rc2016, quantity_total=1000)
     db.session.add(day1)
-    day2 = InventoryItem(title='day2', organization=hasgeek, quantity_total=1000)
+    day2 = InventoryItem(title='day2', item_collection=rc2016, quantity_total=1000)
     db.session.add(day2)
 
     category_conference = Category(title='Conference', item_collection=rc2016, seq=1)

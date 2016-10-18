@@ -20,14 +20,14 @@ def jsonify_line_items(line_items):
     for line_item in line_items:
         item = SaleItem.query.get(line_item.item_id)
         if not items_json.get(unicode(line_item.item_id)):
-            items_json[unicode(line_item.item_id)] = {'is_available': item.is_available, 'quantity': 0, 'final_amount': Decimal(0)}
+            items_json[unicode(line_item.item_id)] = {'is_available': item.is_available(), 'quantity': 0, 'final_amount': Decimal(0)}
         if line_item.base_amount is not None:
             items_json[unicode(line_item.item_id)]['base_amount'] = line_item.base_amount
             items_json[unicode(line_item.item_id)]['final_amount'] += line_item.base_amount
         else:
             items_json[unicode(line_item.item_id)]['final_amount'] = None
         items_json[unicode(line_item.item_id)]['quantity'] += 1
-        items_json[unicode(line_item.item_id)]['quantity_available'] = item.quantity_available
+        items_json[unicode(line_item.item_id)]['quantity_available'] = item.get_available_quantity()
     return items_json
 
 

@@ -3,7 +3,7 @@
 from flask import make_response, render_template, jsonify, request
 from coaster.views import load_models
 from .. import app
-from ..models import ItemCollection, SaleItem, SaleItemImage
+from ..models import ItemCollection, SaleItemImage
 from utils import xhr_only, cors
 
 
@@ -17,8 +17,8 @@ def jsonify_item(item):
             'id': item.id,
             'image': {'url': primary_image.url, 'title': primary_image.title} if primary_image else None,
             'description': item.description.text,
-            'quantity_available': item.quantity_available,
-            'is_available': item.is_available,
+            'quantity_available': item.get_available_quantity(),
+            'is_available': item.is_available(),
             'category_id': item.category_id,
             'item_collection_id': item.item_collection_id,
             'price': price.amount,
@@ -29,7 +29,7 @@ def jsonify_item(item):
 
 def jsonify_category(category):
     category_items = []
-    for item in SaleItem.get_by_category(category):
+    for item in category.sale_items:
         item_json = jsonify_item(item)
         if item_json:
             category_items.append(item_json)

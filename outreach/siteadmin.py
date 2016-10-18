@@ -42,7 +42,7 @@ class CategoryModelView(SiteAdminModelView):
 class InventoryItemModelView(SiteAdminModelView):
     can_delete = False
     column_display_pk = True
-    column_filters = ['organization']
+    column_filters = ['item_collection']
     column_searchable_list = ['title']
     column_list = ('id', 'title')
     form_excluded_columns = ['parent', 'line_items', 'created_at', 'updated_at']

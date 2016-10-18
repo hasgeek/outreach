@@ -2,15 +2,16 @@
 
 from datetime import datetime
 from decimal import Decimal
-from ..models import db, BaseScopedNameMixin, MarkdownColumn, Organization, ItemCollection, Category
+from sqlalchemy.ext.orderinglist import ordering_list
+from . import db, BaseScopedNameMixin, MarkdownColumn, ItemCollection, Category
 
 
 __all__ = ['InventoryItem', 'SaleItem', 'SaleItemImage', 'Price']
 
 inventory_item_sale_item = db.Table('inventory_item_sale_item', db.Model.metadata,
-    db.Column('inventory_item_id', None, db.ForeignKey('inventory_item.id'), primary_key=True),
     db.Column('sale_item_id', None, db.ForeignKey('sale_item.id'), primary_key=True),
-    db.Column('created_at', db.DateTime, default=datetime.utcnow, nullable=False))
+    db.Column('inventory_item_id', None, db.ForeignKey('inventory_item.id'), primary_key=True, index=True),
+    db.Column('created_at', db.DateTime, default=db.func.utcnow(), nullable=False))
 
 
 class InventoryItem(BaseScopedNameMixin, db.Model):
@@ -19,16 +20,14 @@ class InventoryItem(BaseScopedNameMixin, db.Model):
     __tablename__ = 'inventory_item'
     __uuid_primary_key__ = True
 
-    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'),
-        nullable=False)
-    organization = db.relationship(Organization,
-        backref=db.backref('inventory_items', cascade='all, delete-orphan'))
-    parent = db.synonym('organization')
+    item_collection_id = db.Column(None, db.ForeignKey('item_collection.id'), nullable=False)
+    item_collection = db.relationship(ItemCollection, backref=db.backref('inventory_items', cascade='all, delete-orphan'))
+    parent = db.synonym('item_collection')
 
     quantity_total = db.Column(db.Integer, default=0, nullable=False)
     cancellable_until = db.Column(db.DateTime, nullable=True)
 
-    sale_items = db.relationship('SaleItem', secondary=inventory_item_sale_item)
+    sale_items = db.relationship('SaleItem', secondary=inventory_item_sale_item, backref=db.backref('inventory_items'))
 
 
 class SaleItem(BaseScopedNameMixin, db.Model):
@@ -37,17 +36,17 @@ class SaleItem(BaseScopedNameMixin, db.Model):
     __tablename__ = 'sale_item'
     __uuid_primary_key__ = True
 
+    seq = db.Column(db.Integer, nullable=False)
     item_collection_id = db.Column(None, db.ForeignKey('item_collection.id'), nullable=False)
-    item_collection = db.relationship(ItemCollection, backref=db.backref('sale_items', cascade='all, delete-orphan'))
+    item_collection = db.relationship(ItemCollection, backref=db.backref('sale_items', cascade='all, delete-orphan', lazy='dynamic'))
     parent = db.synonym('item_collection')
 
     category_id = db.Column(None, db.ForeignKey('category.id'), nullable=False)
-    category = db.relationship(Category, backref=db.backref('sale_items', cascade='all, delete-orphan'))
+    category = db.relationship(Category, backref=db.backref('sale_items', cascade='all, delete-orphan',
+        order_by=seq,
+        collection_class=ordering_list('seq', count_from=1)))
 
-    inventory_items = db.relationship('InventoryItem', secondary=inventory_item_sale_item)
-
-    description = MarkdownColumn('description', default=u'', nullable=False)
-    seq = db.Column(db.Integer, nullable=False)
+    description = MarkdownColumn('description', default=u"", nullable=False)
 
     def current_price(self):
         """Return the current price object for an item."""
@@ -56,13 +55,8 @@ class SaleItem(BaseScopedNameMixin, db.Model):
     def price_at(self, timestamp):
         """Return the price object for an item at a given time."""
         return Price.query.filter(Price.sale_item == self, Price.start_at <= timestamp,
-            Price.end_at > timestamp).order_by('created_at desc').first()  # noqa
+            Price.end_at > timestamp).order_by('created_at desc').first()
 
-    @classmethod
-    def get_by_category(cls, category):
-        return cls.query.filter(SaleItem.category == category).order_by('seq')
-
-    @property
     def is_available(self):
         """Checks if an item has a current price object and has a positive quantity_available"""
         if not self.current_price():
@@ -72,15 +66,14 @@ class SaleItem(BaseScopedNameMixin, db.Model):
                 return False
         return True
 
-    @property
-    def quantity_available(self):
+    def get_available_quantity(self):
         """
         Checks the associated inventory items, computes the quantity available in each inventory item
         and returns the maximum quantity available. Returns 0 if the computed quantity_available is <= 0.
         """
-        quantity_available = min([inventory_item.quantity_total - self.get_confirmed_line_items.count()
+        available_quantity = min([inventory_item.quantity_total - self.get_confirmed_line_items.count()
             for inventory_item in self.inventory_items])
-        return quantity_available if quantity_available > 0 else 0
+        return max(available_quantity, 0)
 
 
 class SaleItemImage(BaseScopedNameMixin, db.Model):
@@ -95,8 +88,11 @@ class SaleItemImage(BaseScopedNameMixin, db.Model):
         db.UniqueConstraint('sale_item_id', 'primary'))
 
     url = db.Column(db.Unicode(2083), nullable=False)
+    seq = db.Column(db.Integer, nullable=False)
     sale_item_id = db.Column(None, db.ForeignKey('sale_item.id'), nullable=False, index=True)
-    sale_item = db.relationship(SaleItem, backref=db.backref('images', cascade='all, delete-orphan'))
+    sale_item = db.relationship(SaleItem, backref=db.backref('images', cascade='all, delete-orphan',
+        order_by=seq,
+        collection_class=ordering_list('seq', count_from=1)))
     parent = db.synonym('sale_item')
     primary = db.Column(db.Boolean, nullable=True, default=None)
 
@@ -104,7 +100,10 @@ class SaleItemImage(BaseScopedNameMixin, db.Model):
     def get_primary(cls, sale_item):
         return cls.query.filter(cls.sale_item == sale_item, cls.primary == True).one_or_none()
 
-    def set_as_primary(self):
+    def make_primary(self):
+        current_primary = SaleItemImage.get_primary(self.sale_item)
+        if current_primary:
+            current_primary.primary = None
         self.primary = True
 
 
