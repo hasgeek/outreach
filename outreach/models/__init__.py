@@ -10,4 +10,3 @@ from .category import *
 from .item import *
 from .order import *
 from .line_item import *
-from .payment import *

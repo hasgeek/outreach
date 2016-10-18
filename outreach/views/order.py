@@ -106,4 +106,4 @@ def inquiry(item_collection):
             db.session.add(order_session)
     db.session.commit()
     send_confirmation_mail.delay(order.id, "Thank you for your interest!")
-    return make_response(jsonify(order_id=order.id, order_access_token=order.access_token))
+    return make_response(jsonify(order_id=order.id, order_access_token=order.access_token), 201)

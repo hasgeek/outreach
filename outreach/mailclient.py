@@ -5,13 +5,13 @@ from flask.ext.rq import job
 from flask.ext.mail import Message
 from html2text import html2text
 from premailer import transform as email_transform
-from .models import Order, LineItem, LINE_ITEM_STATUS
+from .models import Order, LineItem
 from . import mail, app
 
 
 @job('outreach')
 def send_confirmation_mail(order_id, subject="Thank you for your order!"):
-    """Sends an confirmation email"""
+    """Sends a order confirmation email to the buyer, and CC's it to the organization's contact email."""
     with app.test_request_context():
         order = Order.query.get(order_id)
         msg = Message(subject=subject, recipients=[order.buyer_email], bcc=[order.organization.contact_email])
