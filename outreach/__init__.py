@@ -27,7 +27,24 @@ assets['outreach.js'][version] = 'js/scripts.js'
 
 from . import extapi, views  # NOQA
 from outreach.models import db, Order, User, InventoryItem, SaleItem, SaleItemImage, Price, ItemCollection, Organization, Category  # noqa
-from siteadmin import ItemCollectionModelView, InventoryItemModelView, SaleItemModelView, SaleItemImageView, PriceModelView, OrganizationModelView, CategoryModelView, OrderModelView  # noqa
+
+
+def init_flask_admin():
+    from siteadmin import ItemCollectionModelView, InventoryItemModelView, SaleItemModelView, SaleItemImageView, PriceModelView, OrganizationModelView, CategoryModelView, OrderModelView  # noqa
+    try:
+        admin = Admin(app, name="Outreach Admin", template_mode='bootstrap3', url='/siteadmin')
+        admin.add_view(OrganizationModelView(Organization, db.session))
+        admin.add_view(ItemCollectionModelView(ItemCollection, db.session))
+        admin.add_view(CategoryModelView(Category, db.session))
+        admin.add_view(InventoryItemModelView(InventoryItem, db.session))
+        admin.add_view(SaleItemModelView(SaleItem, db.session))
+        admin.add_view(SaleItemImageView(SaleItemImage, db.session))
+        admin.add_view(PriceModelView(Price, db.session))
+        admin.add_view(OrderModelView(Order, db.session))
+    except AssertionError:
+        # AssertionError is ignored because of blueprint collisions that occur while running tests
+        # See https://github.com/flask-admin/flask-admin/issues/910
+        pass
 
 
 # Configure the app
@@ -46,17 +63,4 @@ def init_for(env):
     mail.init_app(app)
     wtforms_json.init()
 
-    # This is a temporary solution for an admin interface, only
-    # to be used until the native admin interface is ready.
-    try:
-        admin = Admin(app, name="Outreach Admin", template_mode='bootstrap3', url='/siteadmin')
-        admin.add_view(OrganizationModelView(Organization, db.session))
-        admin.add_view(ItemCollectionModelView(ItemCollection, db.session))
-        admin.add_view(CategoryModelView(Category, db.session))
-        admin.add_view(InventoryItemModelView(InventoryItem, db.session))
-        admin.add_view(SaleItemModelView(SaleItem, db.session))
-        admin.add_view(SaleItemImageView(SaleItemImage, db.session))
-        admin.add_view(PriceModelView(Price, db.session))
-        admin.add_view(OrderModelView(Order, db.session))
-    except AssertionError:
-        pass
+    init_flask_admin()
