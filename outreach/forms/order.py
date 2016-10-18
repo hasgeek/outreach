@@ -11,7 +11,7 @@ def truncate(length):
     Return a function that truncates data to the given length.
     To be used as part of the filters argument.
     Eg:
-    field = forms.StringField(__("Some field"), filters=[trim(25)])
+    field = forms.StringField(__("Some field"), filters=[truncate(25)])
     """
     def _inner(data):
         return unicode(data[:length])
