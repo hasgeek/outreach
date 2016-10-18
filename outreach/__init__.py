@@ -39,7 +39,6 @@ def init_for(env):
     RQ(app)
 
     lastuser.init_app(app)
-    # import IPython; IPython.embed()
     lastuser.init_usermanager(UserManager(db, User))
     app.config['tz'] = timezone(app.config['TIMEZONE'])
     baseframe.init_app(app, requires=['outreach'], ext_requires=['baseframe-bs3', 'fontawesome>=4.0.0', 'ractive', 'ractive-transitions-fly', 'validate', 'nprogress', 'baseframe-footable'])
