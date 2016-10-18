@@ -200,7 +200,7 @@
             {{#errormsg.company}}<p class="form-error-msg">{{ errormsg.company }}</p>{{/}}
           </div>
 
-          {{#if getLineItemsLength(order.line_items) > 0}}
+          {{#if !isCartEmpty()}}
             <div class="checkout-confirmation">
               {{#if order.status == 0}}
                 <p class="summary">Your're interested in</p>

@@ -129,16 +129,6 @@ $(function() {
         urlFor: function(id){
           return boxoffice.config.baseURL + '/order/' + id + '/free';
         }
-      },
-      receipt: {
-        urlFor: function(accessToken){
-          return boxoffice.config.baseURL + "/order/" + accessToken + "/receipt";
-        }
-      },
-      attendeeAssignment: {
-        urlFor: function(accessToken){
-          return boxoffice.config.baseURL + "/order/" + accessToken + "/ticket";
-        }
       }
     };
   };
@@ -239,17 +229,16 @@ $(function() {
               }
             }
           },
-          getLineItemsLength: function(line_items) {            
-            return line_items.reduce(function(previousline_item, currentline_item) {
-              return {quantity: previousline_item.quantity + currentline_item.quantity};
-            }).quantity;
+          isCartEmpty: function(){
+            return boxoffice.ractive.get('order.line_items').filter(function(line_item){
+              return line_item.quantity > 0;
+            }).length === 0;
           },
           truncateDescription: function(description) {
             var max_character_count = 200;
             if (description.length < max_character_count) {
               return description;
-            }
-            else {
+            } else {
               return description.slice(0, max_character_count) + '<span>...</span>';
             }
           },
