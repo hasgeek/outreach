@@ -19,6 +19,7 @@ class ItemCollection(BaseScopedNameMixin, db.Model):
     organization = db.relationship(Organization,
         backref=db.backref('item_collections', cascade='all, delete-orphan'))
 
+    # The currently used field in details is refund_policy (html)
     details = db.Column(JsonDict, server_default='{}', nullable=False)
 
     parent = db.synonym('organization')
