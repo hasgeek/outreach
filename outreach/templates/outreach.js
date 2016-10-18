@@ -191,6 +191,7 @@ $(function() {
         data: {
           refund_policy : data.refund_policy,
           cartSideBarOpen : false,
+          description_max_ch_count: 200,
           order: {
             order_id: '',
             status: '',
@@ -277,19 +278,6 @@ $(function() {
             scrollTop: $("#" + boxoffice.ractive.el.id).offset().top
           }, '300');
         },
-        openCart: function(event, action) {
-          event.original.preventDefault();
-          boxoffice.ractive.set('cartSideBarOpen', action);
-          var body;
-          if(action) {
-            body = document.getElementsByTagName("body")[0];
-            body.style.overflow = "hidden";
-          }
-          else {
-            body = document.getElementsByTagName("body")[0];
-            body.style.overflow = "";
-          }
-        },
         selectItems: function(event) {
           // Makes the 'Select Items' tab active
           event.original.preventDefault();
@@ -319,6 +307,8 @@ $(function() {
               if (increment) {
                 if (lineItem.quantity < quantityAvailable) {
                   lineItem.quantity += 1;
+                  //CartAnimation: For cart visibility & to show order final amount
+                  boxoffice.ractive.cartAnimation();
                 }
                 boxoffice.ractive.fire('eventAnalytics', 'add ticket', item_name);
               } else if (lineItem.quantity !== 0) {
@@ -336,6 +326,27 @@ $(function() {
             'tabs.selectItems.isLoadingFail': false,
           });
           boxoffice.ractive.calculateOrder();
+        },
+        openCart: function(event, action) {
+          //Slide open or close cart
+          event.original.preventDefault();
+          boxoffice.ractive.set('cartSideBarOpen', action);
+          var body;
+          if(action) {
+            body = document.getElementsByTagName("body")[0];
+            body.style.overflow = "hidden";
+          }
+          else {
+            body = document.getElementsByTagName("body")[0];
+            body.style.overflow = "";
+          }
+        },
+        cartAnimation: function() {
+          //To show order final amount next to the cart btn
+          boxoffice.ractive.set('order.show_cart_total', true);
+          window.setTimeout(function() {
+            boxoffice.ractive.set('order.show_cart_total', false);
+          }, 3000)
         },
         calculateOrder: function() {
           // Asks the server for the order's calculation and updates the order

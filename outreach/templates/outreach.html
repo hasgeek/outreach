@@ -14,9 +14,14 @@
   {{#tabs:tab}}
     {{#if id === 'boxoffice-selectItems' && id === activeTab}}
       <div id='{{id}}' class="boxoffice-section ticket-selection-content clearfix" intro-outro='fly:{"x":0,"y":"0"}'>
-        <button class="cart-btn {{#if order.readyToCheckout}}items-present{{/if}}" on-click="openCart(event, true)">
-          <i class="fa fa-shopping-cart"></i>
-        </button>
+        <div class="cart-btn-wrapper">
+          <button class="cart-btn {{#if order.readyToCheckout}}items-present{{/if}}" on-click="openCart(event, true)">
+            <i class="fa fa-shopping-cart"></i>
+          </button>
+          {{#if order.show_cart_total}}
+            <p class="cart-total" on-click="openCart(event, true)" intro-outro='fly:{"x":50,"y":"0"}'>Total <span>{{ formatToIndianRupee(order.final_amount) }}</span> <i class="fa  fa-arrow-circle-right"></i></p>
+          {{/if}}
+        </div>
         
         <button class="boxoffice-button boxoffice-button-info contact-btn" on-click="getContactDetails(event)">
           <i class="fa fa-phone"></i> Talk to us
@@ -54,12 +59,16 @@
                         {{/if}}
 
                         <div class="ticket-description">
-                          {{#if !expand}}
-                            {{{ truncateDescription(line_item.item_description) }}}
-                            <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, true)"><i class="fa fa-caret-down"></i> Read More</a>
+                          {{#if line_item.item_description.length > 200}}
+                            {{#if !expand}}
+                              {{{ truncateDescription(line_item.item_description) }}}
+                              <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, true)"><i class="fa fa-caret-down"></i> Read More</a>
+                            {{else}}
+                              {{{ line_item.item_description }}}
+                              <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, false)"><i class="fa fa-caret-up"></i> Close</a>
+                            {{/if}}
                           {{else}}
                             {{{ line_item.item_description }}}
-                            <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, false)"><i class="fa fa-caret-up"></i> Close</a>
                           {{/if}}
                         </div>
 
@@ -217,7 +226,7 @@
 
           <div class="proceed-button-wrapper">
             {{#if order.status == 0}}
-              <button class="boxoffice-button boxoffice-button-info edit-order" type="button" on-click="selectItems(event)">Back</button>
+              <button class="boxoffice-button boxoffice-button-info edit-order" type="button" on-click="selectItems(event)">Go back</button>
               <button type="submit" class="boxoffice-button boxoffice-button-action" {{#loadingOrder}}disabled{{/}} on-click="checkout(event, false)">
               Call me {{#loadingOrder}}<i class="fa fa-spinner fa-spin" intro='fly:{"x":0,"y":"0"}'>{{/}}
               </button>
@@ -374,7 +383,7 @@
     position: relative;
   }
   .boxoffice-section {
-    padding: 15px 15px 0;
+    padding: 15px;
     border: 2px solid #ccc;
     border-top-width: 0;
     min-height: 450px;
@@ -464,10 +473,22 @@
       margin: 15px 0 15px 15px;
     }
   }
+  @media (min-width: 900px) {
+    .category-items {
+      text-align: center;
+    }
+    .card {
+      width: 80%;
+    }
+  }
   @media (min-width: 1200px) {
+    .category-items {
+      text-align: left;
+    }
     .card {
       width: 48%;
       margin: 15px 0 15px 2%;
+      min-height: 634px;
     }
   }
   .ticket-selected {
@@ -680,29 +701,27 @@
     border-top: 3px solid #ccc;
     margin: 0 -15px 0;
   }
-  .cart-btn {
+  .cart-btn-wrapper {
     position: fixed;
     bottom: 10px;
     right: 25px;
-    font-size: 35px;
-    color: #fff;
-    background-color: #856A91;
-    border-radius: 5px;
     z-index: 998;
-    border-color: #2f2433;
-    border-width: 0 0 5px;
+  }
+  .cart-btn ,
+  .cart-total {
+    color: #fff;
+    background-color: #FAA51A;
+    border-color: #d98f15;
+    border-radius: 5px;
+    border-width: 0px 0px 3px;
     border-style: solid;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
+  }
+  .cart-btn {
+    font-size: 35px;
     padding-right: 9px;
-  }
-  @media (min-width: 1024px) {
-    .cart-btn {
-      right: 12%;
-    }
-  }
-  .cart-btn.items-present {
-    animation-duration: 0.2s;
-    animation-name: bounce;
+    position: relative;
+    z-index: 999;
   }
   .cart-btn.items-present:after {
     content: "";
@@ -714,10 +733,23 @@
     background-color: red;
     border-radius: 50%;
   }
-  @keyframes bounce {
-    0%   {bottom: 25px;}
-    50%  {bottom: 65px;}
-    100% {bottom: 25px;}
+  .cart-total {
+    position: absolute;
+    right: 45px;
+    top: 0;
+    min-width: 155px;
+    border-radius: 5px 0 0 5px;
+    padding: 15px;
+    height: 53px;
+    font-size: 15px;
+    text-align: center;
+    z-index: 998;
+    cursor: pointer;
+  }
+  @media (min-width: 1024px) {
+    .cart-btn-wrapper {
+      right: 12%;
+    }
   }
   .cart-content {
     width: 100%;
