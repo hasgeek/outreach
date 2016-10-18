@@ -74,9 +74,13 @@ class SaleItem(BaseScopedNameMixin, db.Model):
 
     @property
     def quantity_available(self):
-        min_quantity_available = min([inventory_item.quantity_total - self.get_confirmed_line_items.count()
+        """
+        Checks the associated inventory items, computes the quantity available in each inventory item
+        and returns the maximum quantity available. Returns 0 if the computed quantity_available is <= 0.
+        """
+        quantity_available = min([inventory_item.quantity_total - self.get_confirmed_line_items.count()
             for inventory_item in self.inventory_items])
-        return min_quantity_available if min_quantity_available > 0 else 0
+        return quantity_available if quantity_available > 0 else 0
 
 
 class SaleItemImage(BaseScopedNameMixin, db.Model):
