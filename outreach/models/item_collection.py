@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ..models import db, BaseScopedNameMixin, Organization, MarkdownColumn
+from ..models import db, BaseScopedNameMixin, Organization, MarkdownColumn, JsonDict
 
 __all__ = ['ItemCollection']
 
@@ -18,5 +18,7 @@ class ItemCollection(BaseScopedNameMixin, db.Model):
         nullable=False)
     organization = db.relationship(Organization,
         backref=db.backref('item_collections', cascade='all, delete-orphan'))
+
+    details = db.Column(JsonDict, server_default='{}', nullable=False)
 
     parent = db.synonym('organization')
