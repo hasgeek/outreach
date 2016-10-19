@@ -70,21 +70,6 @@ class Order(BaseMixin, db.Model):
             perms.add('org_admin')
         return perms
 
-    def confirm_sale(self):
-        """Updates the status to ORDER_STATUS.SALES_ORDER"""
-        for line_item in self.line_items:
-            line_item.confirm()
-        self.invoice_no = get_latest_invoice_no(self.organization) + 1
-        self.status = ORDER_STATUS.SALES_ORDER
-        self.paid_at = datetime.utcnow()
-
-    def invoice(self):
-        """Sets invoiced_at, status"""
-        for line_item in self.line_items:
-            line_item.confirm()
-        self.invoiced_at = datetime.utcnow()
-        self.status = ORDER_STATUS.INVOICE
-
     def register_inquiry(self):
         self.inquired_at = datetime.utcnow()
         self.status = ORDER_STATUS.CUSTOMER_INQUIRY

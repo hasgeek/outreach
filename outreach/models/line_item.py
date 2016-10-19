@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from decimal import Decimal
-import datetime
 from collections import namedtuple
-from sqlalchemy.sql import func
 from sqlalchemy.ext.orderinglist import ordering_list
 from ..models import db, BaseMixin, Order, SaleItem
 from coaster.utils import LabeledEnum
@@ -69,9 +67,6 @@ class LineItem(BaseMixin, db.Model):
 
         return line_items
 
-    def confirm(self):
-        self.status = LINE_ITEM_STATUS.CONFIRMED
-
     @property
     def is_confirmed(self):
         return self.status == LINE_ITEM_STATUS.CONFIRMED
@@ -79,15 +74,6 @@ class LineItem(BaseMixin, db.Model):
     @property
     def is_cancelled(self):
         return self.status == LINE_ITEM_STATUS.CANCELLED
-
-    def cancel(self):
-        """Sets status and cancelled_at."""
-        self.status = LINE_ITEM_STATUS.CANCELLED
-        self.cancelled_at = func.utcnow()
-
-    def is_cancellable(self):
-        return self.is_confirmed and (datetime.datetime.now() < self.item.cancellable_until
-            if self.item.cancellable_until else True)
 
 
 def sale_item_confirmed_line_items(self):
