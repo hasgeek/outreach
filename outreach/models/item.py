@@ -62,7 +62,7 @@ class SaleItem(BaseScopedNameMixin, db.Model):
         if not self.current_price():
             return False
         for inventory_item in self.inventory_items:
-            if self.get_confirmed_line_items.count() >= inventory_item.quantity_total:
+            if self.confirmed_line_items.count() >= inventory_item.quantity_total:
                 return False
         return True
 
@@ -71,7 +71,7 @@ class SaleItem(BaseScopedNameMixin, db.Model):
         Checks the associated inventory items, computes the quantity available in each inventory item
         and returns the maximum quantity available. Returns 0 if the computed quantity_available is <= 0.
         """
-        available_quantity = min([inventory_item.quantity_total - self.get_confirmed_line_items.count()
+        available_quantity = min([inventory_item.quantity_total - self.confirmed_line_items.count()
             for inventory_item in self.inventory_items])
         return max(available_quantity, 0)
 
