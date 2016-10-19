@@ -235,7 +235,7 @@ $(function() {
             }).length === 0;
           },
           truncateDescription: function(description) {
-            var max_character_count = 200;
+            var max_character_count = this.get('description_max_ch_count');
             if (description.length < max_character_count) {
               return description;
             } else {

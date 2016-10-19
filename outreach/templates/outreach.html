@@ -19,7 +19,7 @@
             <i class="fa fa-shopping-cart"></i>
           </button>
           {{#if order.show_cart_total}}
-            <p class="cart-total" on-click="openCart(event, true)" intro-outro='fly:{"x":50,"y":"0"}'>Total <span>{{ formatToIndianRupee(order.final_amount) }}</span> <i class="fa  fa-arrow-circle-right"></i></p>
+            <p class="cart-total" on-click="openCart(event, true)" intro-outro='fly:{"x":50,"y":"0",easing:"ease",delay:200}'>Total <span>{{ formatToIndianRupee(order.final_amount) }}</span> <i class="fa  fa-arrow-circle-right"></i></p>
           {{/if}}
         </div>
         
@@ -59,7 +59,7 @@
                         {{/if}}
 
                         <div class="ticket-description">
-                          {{#if line_item.item_description.length > 200}}
+                          {{#if line_item.item_description.length > description_max_ch_count}}
                             {{#if !expand}}
                               {{{ truncateDescription(line_item.item_description) }}}
                               <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, true)"><i class="fa fa-caret-down"></i> Read More</a>
@@ -737,7 +737,7 @@
     position: absolute;
     right: 45px;
     top: 0;
-    min-width: 155px;
+    min-width: 165px;
     border-radius: 5px 0 0 5px;
     padding: 15px;
     height: 53px;
