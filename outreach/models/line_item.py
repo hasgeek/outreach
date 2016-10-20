@@ -63,7 +63,7 @@ class LineItem(BaseMixin, db.Model):
         for line_item_dict in line_item_dicts:
             item = SaleItem.query.get(line_item_dict['item_id'])
             line_items.append(make_ntuple(item_id=item.id,
-                base_amount=item.current_price().amount if item.is_available else None))
+                base_amount=item.current_price().amount if item.is_available() else None))
 
         return line_items
 
