@@ -70,7 +70,7 @@ class Order(BaseMixin, db.Model):
             perms.add('org_admin')
         return perms
 
-    def register_inquiry(self):
+    def make_inquiry(self):
         self.inquired_at = datetime.utcnow()
         self.status = ORDER_STATUS.CUSTOMER_INQUIRY
 

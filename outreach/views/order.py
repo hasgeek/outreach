@@ -80,7 +80,7 @@ def inquiry(item_collection):
         buyer_company=buyer_form.company.data,
         buyer_phone=buyer_form.phone.data)
 
-    order.register_inquiry()
+    order.make_inquiry()
 
     line_item_forms = LineItemForm.process_list(request.json.get('line_items'))
     if line_item_forms:
