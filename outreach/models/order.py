@@ -104,9 +104,7 @@ class OrderSession(BaseMixin, db.Model):
 
     customer_order_id = db.Column(None, db.ForeignKey('customer_order.id'), nullable=False, index=True, unique=False)
     order = db.relationship(Order, backref=db.backref('session', cascade='all, delete-orphan', uselist=False))
-
     referrer = db.Column(db.Unicode(2083), nullable=True)
-
     # Google Analytics parameters
     utm_source = db.Column(db.Unicode(250), nullable=False, default=u"", index=True)
     utm_medium = db.Column(db.Unicode(250), nullable=False, default=u"", index=True)

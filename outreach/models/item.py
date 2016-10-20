@@ -23,10 +23,8 @@ class InventoryItem(BaseScopedNameMixin, db.Model):
     item_collection_id = db.Column(None, db.ForeignKey('item_collection.id'), nullable=False)
     item_collection = db.relationship(ItemCollection, backref=db.backref('inventory_items', cascade='all, delete-orphan'))
     parent = db.synonym('item_collection')
-
     quantity_total = db.Column(db.Integer, default=0, nullable=False)
     cancellable_until = db.Column(db.DateTime, nullable=True)
-
     sale_items = db.relationship('SaleItem', secondary=inventory_item_sale_item, backref=db.backref('inventory_items'))
 
 
@@ -40,12 +38,10 @@ class SaleItem(BaseScopedNameMixin, db.Model):
     item_collection_id = db.Column(None, db.ForeignKey('item_collection.id'), nullable=False)
     item_collection = db.relationship(ItemCollection, backref=db.backref('sale_items', cascade='all, delete-orphan', lazy='dynamic'))
     parent = db.synonym('item_collection')
-
     category_id = db.Column(None, db.ForeignKey('category.id'), nullable=False)
     category = db.relationship(Category, backref=db.backref('sale_items', cascade='all, delete-orphan',
         order_by=seq,
         collection_class=ordering_list('seq', count_from=1)))
-
     description = MarkdownColumn('description', default=u"", nullable=False)
 
     def current_price(self):
@@ -115,10 +111,8 @@ class Price(BaseScopedNameMixin, db.Model):
 
     sale_item_id = db.Column(None, db.ForeignKey('sale_item.id'), nullable=False)
     sale_item = db.relationship(SaleItem, backref=db.backref('prices', cascade='all, delete-orphan'))
-
     parent = db.synonym('sale_item')
     start_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     end_at = db.Column(db.DateTime, nullable=False)
-
     amount = db.Column(db.Numeric, default=Decimal(0), nullable=False)
     currency = db.Column(db.Unicode(3), nullable=False, default=u'INR')
