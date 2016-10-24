@@ -62,7 +62,7 @@ class SaleItemImageView(SiteAdminModelView):
     column_display_pk = True
     column_filters = ['sale_item']
     column_list = ('sale_item', 'url')
-    form_excluded_columns = ['parent', 'primary', 'created_at', 'updated_at']
+    form_excluded_columns = ['parent', 'created_at', 'updated_at']
 
 
 class PriceModelView(SiteAdminModelView):
