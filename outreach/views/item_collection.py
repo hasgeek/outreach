@@ -48,7 +48,7 @@ def jsonify_category(category):
 @cors
 def outreachjs():
     return make_response(jsonify({
-        'script': render_template('outreach.js', base_url=request.url_root.strip('/'),
+        'script': render_template('outreach.js', base_url=request.url_root.rstrip('/'),
         razorpay_key_id=app.config['RAZORPAY_KEY_ID'])
     }))
 
