@@ -28,7 +28,6 @@ def upgrade():
         sa.Column('title', sa.Unicode(length=250), nullable=False),
         sa.Column('id', sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('contact_email'),
         sa.UniqueConstraint('name'),
         sa.UniqueConstraint('userid')
     )

@@ -20,17 +20,14 @@ class User(UserBase2, db.Model):
         return Organization.query.filter(Organization.userid.in_(self.organizations_owned_ids()))
 
 
-def default_user(context):
-    return g.user.id if g.user else None
-
-
 class Organization(ProfileBase, db.Model):
     __tablename__ = 'organization'
-    __table_args__ = (db.UniqueConstraint('contact_email'),)
 
     # The currently used fields in details are address(html), cin (Corporate Identity Number), pan, service_tax_no, support_email,
     # logo (image url), website (url)
     details = db.Column(JsonDict, nullable=False, server_default='{}')
+    # This field is temporary. To be used until
+    # integration with lastuser organizations is complete
     contact_email = db.Column(db.Unicode(254), nullable=False)
 
     def permissions(self, user, inherited=None):
