@@ -27,11 +27,8 @@ def jsonify_item(item):
 
 
 def jsonify_category(category):
-    category_items = []
-    for item in category.sale_items:
-        item_json = jsonify_item(item)
-        if item_json:
-            category_items.append(item_json)
+    category_items = [item_json for item_json in (jsonify_item(item) for item in category.sale_items)
+        if item_json is not None]
     if category_items:
         return {
             'id': category.id,
