@@ -166,7 +166,7 @@ $(function() {
             'base_price': item.price,
             'unit_final_amount': undefined,
             'final_amount': undefined,
-            'item_image': item.image,
+            'item_image': item.images,
             'item_description': item.description,
             'price_valid_upto': boxoffice.util.formatDate(item.price_valid_upto),
             'quantity_available': item.quantity_available,

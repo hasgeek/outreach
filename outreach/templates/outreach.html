@@ -43,12 +43,12 @@
                       <div class="ticket-details">
                         <p class="ticket-title">{{ line_item.item_title }}</p>
                         <div class="ticket-price-wrapper">
-                          <p class="ticket-price {{#if line_item.unit_final_amount >= 0 && line_item.quantity === 0}}strike{{/if}}">{{ formatToIndianRupee(line_item.base_price) }}</p>
+                          <p class="ticket-price">{{ formatToIndianRupee(line_item.base_price) }}<sup>*</sup></p>
                         </div>
 
                         {{#if line_item.item_image}}
                           <div class="ticket-image">
-                            <img src="{{line_item.item_image.url}}" alt="{{line_item.item_image.title}}">
+                            <img src="{{line_item.item_image[0].url}}" alt="{{line_item.item_image[0].title}}">
                           </div>
                         {{else}}
                           <div class="org-logo">
@@ -68,6 +68,7 @@
                           {{else}}
                             {{{ line_item.item_description }}}
                           {{/if}}
+                          <p><sup>*</sup>Prices are exclusive of tax.</p>
                         </div>
 
                         <div class="ticket-price-qty clearfix">
@@ -198,6 +199,11 @@
                 {{#order.line_items}} {{# { line_item: . } }}
                   {{#if line_item.quantity > 0 }}
                     <li class="item-summary">
+                      {{#if line_item.item_image}}
+                        <img src="{{line_item.item_image[0].url}}" alt="{{line_item.item_image[0].title}}" class="ticket-image-thumbnail">
+                      {{else}}
+                        <img src="{{order.org_logo}}" alt="{{order.org_name}}" class="org-logo-thumbnail">
+                      {{/if}}
                       <span class="booked-ticket-title">{{ line_item.item_title }}</span>
                       <p class="booked-ticket-qty">{{ formatToIndianRupee(line_item.base_price) }}</p>
                     </li>
@@ -513,6 +519,12 @@
   .org-logo img {
     width: 100%;
   }
+  .ticket-image-thumbnail,
+  .org-logo-thumbnail {
+    width: 70px;
+    height: auto;
+    border-radius: 5px;
+  }
   .ticket-description {
     font-size: 15px;
     margin-top: 15px;
@@ -718,7 +730,7 @@
   }
   .cart-total {
     position: absolute;
-    right: 46px;
+    right: 45px;
     top: 0;
     min-width: 165px;
     border-radius: 5px 0 0 5px;

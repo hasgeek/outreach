@@ -128,6 +128,10 @@
     .footer {
       margin-top: 15px;
     }
+
+    .footnote {
+      margin-top: 15px;
+    }
   </style>
 </head>
 
@@ -136,7 +140,7 @@
 
     <p>Hello {{ order.buyer_fullname }},</p>
 
-    <p class="content">Thanks for your interest in {{ order.item_collection.title }}.</p>
+    <p class="content">Thank you for supporting {{ order.item_collection.title }}.</p>
 
     {% if order.is_confirmed %}
       <p class="content">We'll mail you the cash receipt within one business day.</p>
@@ -209,35 +213,31 @@
         <tr>
           <th>Item No:</th>
           <th>Base Price</th>
-          <th>Discount</th>
-          <th>Final Price</th>
         </tr>
         
         {% for line_item in line_items -%}
           <tr>
             <td class="center" rowspan="2" valign="top">{{ line_item.seq }}</td>
-            <td colspan="3">
-              <span class="item-title">{{ line_item.item.title }}</span><br>
-              <span class="item-description">{{ line_item.item.description.text|safe }}</span>
+            <td colspan="1">
+              <span class="item-title">{{ line_item.sale_item.title }}</span><br>
+              <span class="item-description">{{ line_item.sale_item.description.text|safe }}</span>
             </td>
           </tr>
           <tr>
-            <td class="center">&#8377; {{ line_item.base_amount }}</td>
-            <td class="center">&#8377; {{ line_item.discounted_amount }}</td>
-            <td class="center">&#8377; {{ line_item.final_amount }}</td>
+            <td class="center">&#8377; {{ line_item.base_amount }}<sup>*</sup></td>
           </tr>
         {%- endfor %}
         
         <tr>
-            <td></td>
-            <td colspan="2" class="total gray">Total</td>
-            <td class="total-amount gray center"><div id="total">&#8377; {{ order.get_amounts().final_amount }}</div></td>
+            <td class="total gray">Total</td>
+            <td class="total-amount gray center"><div id="total">&#8377; {{ order.get_amounts().final_amount }}<sup>*</sup></div></td>
         </tr>
       </table>
     {% endif %}
 
     <p class="footer">Thank you,</p>
     <p>{{ org.title }}</p>
+    <p class="footnote"><sup>*</sup>Prices are exclusive of tax.</p>
   
   </div>
 </body>
