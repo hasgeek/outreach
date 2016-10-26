@@ -204,14 +204,12 @@ def upgrade():
         sa.Column('url', sa.Unicode(length=2083), nullable=False),
         sa.Column('seq', sa.Integer(), nullable=False),
         sa.Column('sale_item_id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
-        sa.Column('primary', sa.Boolean(), nullable=True),
         sa.Column('name', sa.Unicode(length=250), nullable=False),
         sa.Column('title', sa.Unicode(length=250), nullable=False),
         sa.Column('id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
         sa.ForeignKeyConstraint(['sale_item_id'], ['sale_item.id'], ),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('sale_item_id', 'name'),
-        sa.UniqueConstraint('sale_item_id', 'primary')
+        sa.UniqueConstraint('sale_item_id', 'name')
     )
     op.create_index(op.f('ix_sale_item_image_sale_item_id'), 'sale_item_image', ['sale_item_id'], unique=False)
 

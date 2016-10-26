@@ -80,8 +80,7 @@ class SaleItemImage(BaseScopedNameMixin, db.Model):
 
     __tablename__ = 'sale_item_image'
     __uuid_primary_key__ = True
-    __table_args__ = (db.UniqueConstraint('sale_item_id', 'name'),
-        db.UniqueConstraint('sale_item_id', 'primary'))
+    __table_args__ = (db.UniqueConstraint('sale_item_id', 'name'), )
 
     url = db.Column(db.Unicode(2083), nullable=False)
     seq = db.Column(db.Integer, nullable=False)
@@ -90,17 +89,6 @@ class SaleItemImage(BaseScopedNameMixin, db.Model):
         order_by=seq,
         collection_class=ordering_list('seq', count_from=1)))
     parent = db.synonym('sale_item')
-    primary = db.Column(db.Boolean, nullable=True, default=None)
-
-    @classmethod
-    def get_primary(cls, sale_item):
-        return cls.query.filter(cls.sale_item == sale_item, cls.primary == True).one_or_none()
-
-    def make_primary(self):
-        current_primary = SaleItemImage.get_primary(self.sale_item)
-        if current_primary:
-            current_primary.primary = None
-        self.primary = True
 
 
 class Price(BaseScopedNameMixin, db.Model):
