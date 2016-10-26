@@ -86,5 +86,5 @@ SaleItem.confirmed_line_items = property(sale_item_confirmed_line_items)
 
 def order_confirmed_line_items(self):
     """Returns a SQLAlchemy query object preset with the order's confirmed line items"""
-    return LineItem.query.filter(LineItem.order == self, LineItem.status == LINE_ITEM_STATUS.CONFIRMED).all()
+    return LineItem.query.filter(LineItem.order == self, LineItem.status == LINE_ITEM_STATUS.CONFIRMED)
 Order.confirmed_line_items = property(order_confirmed_line_items)
