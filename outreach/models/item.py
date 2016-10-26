@@ -112,7 +112,7 @@ class Price(BaseScopedNameMixin, db.Model):
     sale_item_id = db.Column(None, db.ForeignKey('sale_item.id'), nullable=False)
     sale_item = db.relationship(SaleItem, backref=db.backref('prices', cascade='all, delete-orphan'))
     parent = db.synonym('sale_item')
-    start_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    start_at = db.Column(db.DateTime, default=db.func.utcnow(), nullable=False)
     end_at = db.Column(db.DateTime, nullable=False)
     amount = db.Column(db.Numeric, default=Decimal(0), nullable=False)
     currency = db.Column(db.Unicode(3), nullable=False, default=u'INR')

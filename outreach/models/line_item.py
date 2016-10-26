@@ -29,11 +29,11 @@ class LineItem(BaseMixin, db.Model):
     """
     __tablename__ = 'line_item'
     __uuid_primary_key__ = True
-    __table_args__ = (db.UniqueConstraint('customer_order_id', 'seq'),)
+    __table_args__ = (db.UniqueConstraint('order_id', 'seq'),)
 
     # seq is the relative number of the line item per order.
     seq = db.Column(db.Integer, nullable=False)
-    customer_order_id = db.Column(None, db.ForeignKey('customer_order.id'), nullable=False, index=True, unique=False)
+    order_id = db.Column(None, db.ForeignKey('order.id'), nullable=False, index=True, unique=False)
     order = db.relationship(Order, backref=db.backref('line_items', cascade='all, delete-orphan',
         order_by=seq,
         collection_class=ordering_list('seq', count_from=1)))

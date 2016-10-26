@@ -12,13 +12,13 @@ __all__ = ['Order', 'ORDER_STATUS', 'OrderSession']
 
 
 class ORDER_STATUS(LabeledEnum):
-    PURCHASE_ORDER = (0, __("Purchase Order"))
-    SALES_ORDER = (1, __("Sales Order"))
-    INVOICE = (2, __("Invoice"))
-    CUSTOMER_INQUIRY = (3, __("Customer inquiry"))
+    CUSTOMER_INQUIRY = (0, __("Customer inquiry"))
+    PURCHASE_ORDER = (1, __("Purchase Order"))
+    PRO_FORMA_INVOICE = (2, __("Pro-forma Invoice"))
+    INVOICE = (3, __("Invoice"))
 
 
-ORDER_STATUS.CONFIRMED = [ORDER_STATUS.SALES_ORDER, ORDER_STATUS.INVOICE]
+ORDER_STATUS.CONFIRMED = [ORDER_STATUS.PRO_FORMA_INVOICE, ORDER_STATUS.INVOICE]
 
 
 def get_latest_invoice_no(organization):
@@ -34,7 +34,7 @@ def order_amounts_ntuple(base_amount, final_amount, confirmed_amount):
 
 
 class Order(BaseMixin, db.Model):
-    __tablename__ = 'customer_order'
+    __tablename__ = 'order'
     __uuid_primary_key__ = True
     __table_args__ = (db.UniqueConstraint('organization_id', 'invoice_no'),
         db.UniqueConstraint('access_token'))
@@ -47,10 +47,10 @@ class Order(BaseMixin, db.Model):
     organization_id = db.Column(None, db.ForeignKey('organization.id'), nullable=False)
     organization = db.relationship('Organization', backref=db.backref('orders', cascade='all, delete-orphan', lazy='dynamic'))
 
-    status = db.Column(db.Integer, default=ORDER_STATUS.PURCHASE_ORDER, nullable=False)
+    status = db.Column(db.Integer, default=ORDER_STATUS.CUSTOMER_INQUIRY, nullable=False)
 
-    initiated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    inquired_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
+    initiated_at = db.Column(db.DateTime, nullable=False, default=db.func.utcnow())
+    inquired_at = db.Column(db.DateTime, nullable=True, default=db.func.utcnow())
     paid_at = db.Column(db.DateTime, nullable=True)
     invoiced_at = db.Column(db.DateTime, nullable=True)
     cancelled_at = db.Column(db.DateTime, nullable=True)
@@ -71,7 +71,7 @@ class Order(BaseMixin, db.Model):
         return perms
 
     def make_inquiry(self):
-        self.inquired_at = datetime.utcnow()
+        self.inquired_at = db.func.utcnow()
         self.status = ORDER_STATUS.CUSTOMER_INQUIRY
 
     def get_amounts(self):
@@ -102,7 +102,7 @@ class OrderSession(BaseMixin, db.Model):
     __tablename__ = 'order_session'
     __uuid_primary_key__ = True
 
-    customer_order_id = db.Column(None, db.ForeignKey('customer_order.id'), nullable=False, index=True, unique=False)
+    order_id = db.Column(None, db.ForeignKey('order.id'), nullable=False, index=True, unique=False)
     order = db.relationship(Order, backref=db.backref('session', cascade='all, delete-orphan', uselist=False))
     referrer = db.Column(db.Unicode(2083), nullable=True)
     # Google Analytics parameters

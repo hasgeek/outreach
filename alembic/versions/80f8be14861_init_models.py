@@ -80,7 +80,7 @@ def upgrade():
         sa.UniqueConstraint('item_collection_id', 'name'),
         sa.UniqueConstraint('item_collection_id', 'seq')
     )
-    op.create_table('customer_order',
+    op.create_table('order',
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=True),
@@ -121,7 +121,7 @@ def upgrade():
     op.create_table('order_session',
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), nullable=False),
-        sa.Column('customer_order_id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
+        sa.Column('order_id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
         sa.Column('referrer', sa.Unicode(length=2083), nullable=True),
         sa.Column('utm_source', sa.Unicode(length=250), nullable=False),
         sa.Column('utm_medium', sa.Unicode(length=250), nullable=False),
@@ -131,10 +131,10 @@ def upgrade():
         sa.Column('utm_campaign', sa.Unicode(length=250), nullable=False),
         sa.Column('gclid', sa.Unicode(length=250), nullable=False),
         sa.Column('id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
-        sa.ForeignKeyConstraint(['customer_order_id'], ['customer_order.id'], ),
+        sa.ForeignKeyConstraint(['order_id'], ['order.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_order_session_customer_order_id'), 'order_session', ['customer_order_id'], unique=False)
+    op.create_index(op.f('ix_order_session_order_id'), 'order_session', ['order_id'], unique=False)
     op.create_index(op.f('ix_order_session_gclid'), 'order_session', ['gclid'], unique=False)
     op.create_index(op.f('ix_order_session_utm_campaign'), 'order_session', ['utm_campaign'], unique=False)
     op.create_index(op.f('ix_order_session_utm_id'), 'order_session', ['utm_id'], unique=False)
@@ -168,7 +168,7 @@ def upgrade():
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), nullable=False),
         sa.Column('seq', sa.Integer(), nullable=False),
-        sa.Column('customer_order_id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
+        sa.Column('order_id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
         sa.Column('sale_item_id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
         sa.Column('base_amount', sa.Numeric(), nullable=False),
         sa.Column('final_amount', sa.Numeric(), nullable=False),
@@ -176,12 +176,12 @@ def upgrade():
         sa.Column('ordered_at', sa.DateTime(), nullable=True),
         sa.Column('cancelled_at', sa.DateTime(), nullable=True),
         sa.Column('id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
-        sa.ForeignKeyConstraint(['customer_order_id'], ['customer_order.id'], ),
+        sa.ForeignKeyConstraint(['order_id'], ['order.id'], ),
         sa.ForeignKeyConstraint(['sale_item_id'], ['sale_item.id'], ),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('customer_order_id', 'seq')
+        sa.UniqueConstraint('order_id', 'seq')
     )
-    op.create_index(op.f('ix_line_item_customer_order_id'), 'line_item', ['customer_order_id'], unique=False)
+    op.create_index(op.f('ix_line_item_order_id'), 'line_item', ['order_id'], unique=False)
     op.create_index(op.f('ix_line_item_sale_item_id'), 'line_item', ['sale_item_id'], unique=False)
     op.create_table('price',
         sa.Column('created_at', sa.DateTime(), nullable=False),
@@ -222,7 +222,7 @@ def downgrade():
     op.drop_table('sale_item_image')
     op.drop_table('price')
     op.drop_index(op.f('ix_line_item_sale_item_id'), table_name='line_item')
-    op.drop_index(op.f('ix_line_item_customer_order_id'), table_name='line_item')
+    op.drop_index(op.f('ix_line_item_order_id'), table_name='line_item')
     op.drop_table('line_item')
     op.drop_index(op.f('ix_inventory_item_sale_item_inventory_item_id'), table_name='inventory_item_sale_item')
     op.drop_table('inventory_item_sale_item')
@@ -232,10 +232,10 @@ def downgrade():
     op.drop_index(op.f('ix_order_session_utm_id'), table_name='order_session')
     op.drop_index(op.f('ix_order_session_utm_campaign'), table_name='order_session')
     op.drop_index(op.f('ix_order_session_gclid'), table_name='order_session')
-    op.drop_index(op.f('ix_order_session_customer_order_id'), table_name='order_session')
+    op.drop_index(op.f('ix_order_session_order_id'), table_name='order_session')
     op.drop_table('order_session')
     op.drop_table('inventory_item')
-    op.drop_table('customer_order')
+    op.drop_table('order')
     op.drop_table('category')
     op.drop_table('item_collection')
     op.drop_table('user')
