@@ -15,8 +15,8 @@
     {{#if id === 'boxoffice-selectItems' && id === activeTab}}
       <div id='{{id}}' class="boxoffice-section ticket-selection-content clearfix" intro-outro='fly:{"x":0,"y":"0"}'>
         <div class="cart-btn-wrapper">
-          <button class="cart-btn {{#if order.readyToCheckout}}items-present{{/if}}" on-click="openCart(event, true)">
-            <i class="fa fa-shopping-cart"></i>
+          <button class="cart-btn" on-click="openCart(event, true)">
+            <i class="fa fa-phone"></i>
           </button>
           {{#if order.show_cart_total}}
             <p class="cart-total" on-click="openCart(event, true)" intro-outro='fly:{"x":50,"y":"0",easing:"ease",delay:200}'>Total <span>{{ formatToIndianRupee(order.final_amount) }}</span> <i class="fa  fa-arrow-circle-right"></i></p>
@@ -24,7 +24,7 @@
         </div>
         
         <button class="boxoffice-button boxoffice-button-info contact-btn" on-click="getContactDetails(event)">
-          <i class="fa fa-phone"></i> Talk to us
+          <i class="fa fa-phone"></i> Contact sales
         </button>
 
         <div class="inventory-wrapper">
@@ -79,23 +79,12 @@
                                 <span class="available-count">Only {{line_item.quantity_available}} available</span>
                               </p>
                             {{/if}}
-                            {{#if line_item.quantity > 0}}
-                              <div class="price-details-wrapper" outro='fly:{"x":10,"y":0,"duration":100}'>
-                                <div class="ticket-qty-wrapper">
-                                  <button class="decrement" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)">-</button>
-                                  <input type="number" class="ticket-qty" name="quantity" min="0" max="{{ line_item.quantity_available }}" value="{{ line_item.quantity }}" disabled>
-                                  <button class="increment" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">+</button>
-                                </div>
-                              </div>
-                            {{else}}
-                              <div class="add-item-btn">
+                            <div class="add-item-btn">
+                              {{#if line_item.quantity > 0}}
+                                <button class="boxoffice-button boxoffice-button-action" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)"><i class="fa fa-heart"></i> Interested</button>
+                              {{else}}
                                 <button class="boxoffice-button boxoffice-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">I am interested</button>
-                              </div>
-                            {{/if}}
-                            <div class="item-amount">
-                              {{#line_item.final_amount && !isLoadingFail}}
-                                <p intro-outro='fly:{"x":10,"y":"0"}' class="subtotal">Subtotal <span>{{formatToIndianRupee(line_item.final_amount)}}</span></p>
-                              {{/}}
+                              {{/if}}
                             </div>
                           {{else}}
                             <div class="sold-out-wrapper" intro='fly:{"x":100,"y":0}'>
@@ -127,8 +116,7 @@
                 {{#if line_item.quantity > 0 }}
                   <li class="item-summary">
                     <span class="booked-ticket-title">{{ line_item.item_title }}</span>
-                    <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
-                    <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
+                    <p class="booked-ticket-qty">{{ formatToIndianRupee(line_item.base_price) }}</p>
                   </li>
                 {{/if}}
               {{/}}{{/order.line_items}}
@@ -145,7 +133,7 @@
               <p class="price">Total <span class="final-amount">{{ formatToIndianRupee(order.final_amount) }}</span></p>
             </div>
             <button class="boxoffice-button boxoffice-button-info cart-footer-btn" on-click="getContactDetails(event)">
-              <i class="fa fa-phone"></i> Talk to us
+              <i class="fa fa-phone"></i> Contact sales
             </button>
           </div>
         </div>
@@ -213,13 +201,12 @@
                   {{#if line_item.quantity > 0 }}
                     <li class="item-summary">
                       <span class="booked-ticket-title">{{ line_item.item_title }}</span>
-                      <p class="booked-ticket-qty">Qty {{ line_item.quantity }} &times; {{ formatToIndianRupee(line_item.base_price) }}</p>
-                      <p class="booked-ticket-qty">Subtotal {{ formatToIndianRupee(line_item.final_amount) }}</p>
+                      <p class="booked-ticket-qty">{{ formatToIndianRupee(line_item.base_price) }}</p>
                     </li>
                   {{/if}}
                 {{/}}{{/order.line_items}}
               </ol>
-              <p class="price">Amount Payable <span class="final-amount"><b> {{ formatToIndianRupee(order.final_amount) }}</b></span></p>
+              <p class="price">Total <span class="final-amount"><b> {{ formatToIndianRupee(order.final_amount) }}</b></span></p>
               <hr class="separator">
             </div>
           {{/if}}
@@ -391,6 +378,11 @@
   .contact-btn {
     margin: 0 0 15px;
     float: right;
+  }
+  .contact-btn .fa,
+  .cart-footer-btn .fa {
+    position: relative;
+    top: 1px;
   }
   @media (min-width: 768px) {
     .contact-btn {
@@ -710,8 +702,8 @@
   .cart-btn ,
   .cart-total {
     color: #fff;
-    background-color: #FAA51A;
-    border-color: #d98f15;
+    background-color: #005580;
+    border-color: #00334d;
     border-radius: 5px;
     border-width: 0px 0px 3px;
     border-style: solid;
@@ -719,29 +711,23 @@
   }
   .cart-btn {
     font-size: 35px;
-    padding-right: 9px;
+    line-height: 1.3;
     position: relative;
     z-index: 999;
-  }
-  .cart-btn.items-present:after {
-    content: "";
-    position: absolute;
-    top: 8px;
-    right: 3px;
-    width: 8px;
-    height: 8px;
-    background-color: red;
-    border-radius: 50%;
+    padding: 0 9px;
+    margin: 0;
+    height: 53px;
   }
   .cart-total {
     position: absolute;
-    right: 45px;
+    right: 46px;
     top: 0;
     min-width: 165px;
     border-radius: 5px 0 0 5px;
     padding: 15px;
     height: 53px;
     font-size: 15px;
+    line-height: 1.3;
     text-align: center;
     z-index: 998;
     cursor: pointer;
