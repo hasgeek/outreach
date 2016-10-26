@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import index, item_collection, login, order
+from . import item_collection, login, order
