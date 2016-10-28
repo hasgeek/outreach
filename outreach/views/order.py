@@ -31,10 +31,10 @@ def jsonify_line_items(line_items):
     return items_json
 
 
-@app.route('/order/kharcha', methods=['OPTIONS', 'POST'])
+@app.route('/api/1/order/calculate', methods=['OPTIONS', 'POST'])
 @xhr_only
 @cors
-def kharcha():
+def calculate():
     """
     Accepts JSON containing an array of line_items, with the quantity and item_id set for each line_item.
 
@@ -56,14 +56,14 @@ def kharcha():
     return jsonify(line_items=items_json, order={'final_amount': order_final_amount})
 
 
-@app.route('/ic/<item_collection>/inquiry',
+@app.route('/api/1/collection/<item_collection_id>/create_order_inquiry',
            methods=['OPTIONS', 'POST'])
 @load_models(
-    (ItemCollection, {'id': 'item_collection'}, 'item_collection')
+    (ItemCollection, {'id': 'item_collection_id'}, 'item_collection')
     )
 @xhr_only
 @cors
-def inquiry(item_collection):
+def create_order_inquiry(item_collection):
     buyer_form = BuyerForm.from_json(request.json.get('buyer'))
     # See comment in BuyerForm about CSRF
     buyer_form.csrf_enabled = False

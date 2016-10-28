@@ -21,7 +21,7 @@ class TestKharchaAPI(unittest.TestCase):
         first_item = SaleItem.query.filter_by(name='conference-ticket').first()
         quantity = 2
         kharcha_req = {'line_items': [{'item_id': unicode(first_item.id), 'quantity': quantity}]}
-        resp = self.client.post(url_for('kharcha'), data=json.dumps(kharcha_req), content_type='application/json', headers=[('X-Requested-With', 'XMLHttpRequest'), ('Origin', app.config['BASE_URL'])])
+        resp = self.client.post(url_for('calculate'), data=json.dumps(kharcha_req), content_type='application/json', headers=[('X-Requested-With', 'XMLHttpRequest'), ('Origin', app.config['BASE_URL'])])
 
         self.assertEquals(resp.status_code, 200)
         resp_json = json.loads(resp.get_data())
