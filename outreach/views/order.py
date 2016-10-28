@@ -8,7 +8,7 @@ from .. import app
 from utils import xhr_only, cors
 from ..models import db, LineItem, SaleItem, ItemCollection, User, Order, OrderSession
 from ..forms import LineItemForm, BuyerForm, OrderSessionForm
-from outreach.mailclient import send_confirmation_mail
+from ..mailclient import send_confirmation_mail
 
 
 def jsonify_line_items(line_items):
