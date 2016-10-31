@@ -27,7 +27,7 @@ class TestOrder(unittest.TestCase):
                 }
             }
         ic = ItemCollection.query.first()
-        resp = self.client.post('/ic/{ic}/inquiry'.format(ic=ic.id), data=json.dumps(data), content_type='application/json', headers=[('X-Requested-With', 'XMLHttpRequest'), ('Origin', app.config['BASE_URL'])])
+        resp = self.client.post('/api/1/collection/{ic}/create_order_inquiry'.format(ic=ic.id), data=json.dumps(data), content_type='application/json', headers=[('X-Requested-With', 'XMLHttpRequest'), ('Origin', app.config['BASE_URL'])])
         data = json.loads(resp.data)
         self.assertEquals(resp.status_code, 201)
         order = Order.query.get(data.get('order_id'))

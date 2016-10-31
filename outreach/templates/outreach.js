@@ -97,25 +97,19 @@ $(function() {
       itemCollection: {
         method: 'GET',
         urlFor: function(){
-          return outreach.config.baseURL + '/ic/' + config.ic;
+          return outreach.config.baseURL + '/api/1/collection/view/' + config.ic;
         }
       },
       kharcha: {
         method: 'POST',
         urlFor: function(){
-          return outreach.config.baseURL + '/order/kharcha';
-        }
-      },
-      createOrder: {
-        method: 'POST',
-        urlFor: function(){
-          return outreach.config.baseURL + '/ic/' + config.ic + '/order';
+          return outreach.config.baseURL + '/api/1/order/calculate';
         }
       },
       inquiry: {
         method: 'POST',
         urlFor: function(){
-          return outreach.config.baseURL + '/ic/' + config.ic + '/inquiry';
+          return outreach.config.baseURL + '/api/1/collection/' + config.ic + '/create_order_inquiry';
         }
       }
     };
@@ -503,10 +497,7 @@ $(function() {
           outreach.ractive.fire('eventAnalytics', 'order creation', 'createOrder');
           var create_order_url;
           var items;
-          if (proceed_to_payment) {
-            create_order_url = outreach.config.resources.createOrder.urlFor();
-          }
-          else {
+          if (!proceed_to_payment) {
             create_order_url = outreach.config.resources.inquiry.urlFor();
           }
           $.post({

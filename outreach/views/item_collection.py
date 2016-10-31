@@ -3,7 +3,7 @@
 from flask import make_response, render_template, jsonify, request
 from coaster.views import load_models
 from .. import app
-from ..models import ItemCollection, SaleItemImage
+from ..models import ItemCollection
 from utils import xhr_only, cors
 
 
@@ -49,9 +49,9 @@ def outreachjs():
     }))
 
 
-@app.route('/ic/<item_collection>', methods=['GET', 'OPTIONS'])
+@app.route('/api/1/collection/view/<item_collection_id>', methods=['GET', 'OPTIONS'])
 @load_models(
-    (ItemCollection, {'id': 'item_collection'}, 'item_collection')
+    (ItemCollection, {'id': 'item_collection_id'}, 'item_collection')
     )
 @xhr_only
 @cors

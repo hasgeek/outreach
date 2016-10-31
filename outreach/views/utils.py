@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from pytz import utc, timezone
 from flask import request, abort
 from functools import wraps
 from baseframe import localize_timezone
@@ -27,13 +26,9 @@ def date_format(datetime):
     return localize_timezone(datetime).strftime('%d %b %Y')
 
 
-def localize(datetime, tz):
-    return utc.localize(datetime).astimezone(timezone(tz))
-
-
 @app.template_filter('invoice_date')
 def invoice_date_filter(date, format):
-    return localize(date, app.config['TIMEZONE']).strftime(format)
+    return localize_timezone(date, app.config['TIMEZONE']).strftime(format)
 
 
 def cors(f):

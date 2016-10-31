@@ -4,11 +4,12 @@ from datetime import datetime
 from decimal import Decimal
 from flask import request, jsonify, make_response
 from coaster.views import load_models
+from baseframe import _
 from .. import app
 from utils import xhr_only, cors
 from ..models import db, LineItem, SaleItem, ItemCollection, User, Order, OrderSession
 from ..forms import LineItemForm, BuyerForm, OrderSessionForm
-from outreach.mailclient import send_confirmation_mail
+from ..mailclient import send_confirmation_mail
 
 
 def jsonify_line_items(line_items):
@@ -31,10 +32,10 @@ def jsonify_line_items(line_items):
     return items_json
 
 
-@app.route('/order/kharcha', methods=['OPTIONS', 'POST'])
+@app.route('/api/1/order/calculate', methods=['OPTIONS', 'POST'])
 @xhr_only
 @cors
-def kharcha():
+def calculate():
     """
     Accepts JSON containing an array of line_items, with the quantity and item_id set for each line_item.
 
@@ -56,14 +57,14 @@ def kharcha():
     return jsonify(line_items=items_json, order={'final_amount': order_final_amount})
 
 
-@app.route('/ic/<item_collection>/inquiry',
+@app.route('/api/1/collection/<item_collection_id>/create_order_inquiry',
            methods=['OPTIONS', 'POST'])
 @load_models(
-    (ItemCollection, {'id': 'item_collection'}, 'item_collection')
+    (ItemCollection, {'id': 'item_collection_id'}, 'item_collection')
     )
 @xhr_only
 @cors
-def inquiry(item_collection):
+def create_order_inquiry(item_collection):
     buyer_form = BuyerForm.from_json(request.json.get('buyer'))
     # See comment in BuyerForm about CSRF
     buyer_form.csrf_enabled = False
@@ -87,10 +88,10 @@ def inquiry(item_collection):
         line_item_tups = LineItem.calculate([{'item_id': li_form.data.get('item_id')}
             for li_form in line_item_forms
                 for x in range(li_form.data.get('quantity'))])
-        for idx, line_item_tup in enumerate(line_item_tups):
+        for idx, line_item_tup in enumerate(line_item_tups, start=1):
             item = SaleItem.query.get(line_item_tup.item_id)
             line_item = LineItem(order=order, sale_item=item,
-                seq=idx+1,
+                seq=idx,
                 ordered_at=datetime.utcnow(),
                 base_amount=line_item_tup.base_amount,
                 final_amount=line_item_tup.base_amount)
@@ -105,5 +106,5 @@ def inquiry(item_collection):
             order_session_form.populate_obj(order_session)
             db.session.add(order_session)
     db.session.commit()
-    send_confirmation_mail.delay(order.id, "Thank you for your interest!")
+    send_confirmation_mail.delay(order.id, _("Thank you for your interest!"))
     return make_response(jsonify(order_id=order.id, order_access_token=order.access_token), 201)
