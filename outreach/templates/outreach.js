@@ -97,13 +97,13 @@ $(function() {
       itemCollection: {
         method: 'GET',
         urlFor: function(){
-          return boxoffice.config.baseURL + '/ic/' + config.ic;
+          return boxoffice.config.baseURL + '/api/1/collection/view/' + config.ic;
         }
       },
       kharcha: {
         method: 'POST',
         urlFor: function(){
-          return boxoffice.config.baseURL + '/order/kharcha';
+          return boxoffice.config.baseURL + '/api/1/order/calculate';
         }
       },
       createOrder: {
@@ -115,7 +115,7 @@ $(function() {
       inquiry: {
         method: 'POST',
         urlFor: function(){
-          return boxoffice.config.baseURL + '/ic/' + config.ic + '/inquiry';
+          return boxoffice.config.baseURL + '/api/1/ic/' + config.ic + '/create_order_inquiry';
         }
       },
       payment: {
