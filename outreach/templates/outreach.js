@@ -1,10 +1,9 @@
-window.outreach = {
+window.outreach_widget = {
   // Initial config setup
   config:{
     baseURL: "{{base_url}}",
-    razorpayKeyId: "{{razorpay_key_id}}",
     orgName: 'HasGeek',
-    razorpayBanner: "https://hasgeek.com/static/img/hg-banner.png"
+    orgLogo: "https://hasgeek.com/static/img/hg-banner.png"
   }
 };
 
@@ -42,8 +41,9 @@ f})(window,document);"undefined"!==typeof module&&module.exports&&(module.export
 $(function() {
   Ractive.DEBUG = false;
 
-  var outreach = window.outreach;
+  var outreach = {};
   outreach.util = {};
+  outreach.config = window.outreach_widget.config;
 
   outreach.util.getQueryParams = function() {
     // Returns an array of query parameters
@@ -123,9 +123,9 @@ $(function() {
 
   outreach.init = function(widgetConfig) {
     // Config variables provided by the client embedding the widget
-    this.widgetConfig = widgetConfig;
+    outreach.config.widgetConfig = widgetConfig;
     outreach.initResources({
-      ic: widgetConfig.itemCollection
+      ic: outreach.config.widgetConfig.itemCollection
     });
 
     $.get({
@@ -171,14 +171,14 @@ $(function() {
             line_items: lineItems,
             final_amount: 0.0,
             readyToCheckout: false,
-            org_name: outreach.widgetConfig.org || outreach.config.orgName,
-            org_logo: outreach.widgetConfig.razorpayBanner || outreach.config.razorpayBanner
+            org_name: outreach.config.widgetConfig.orgName || outreach.config.orgName,
+            org_logo: outreach.config.widgetConfig.eventLogo || outreach.config.orgLogo
           },
           // Prefill name, email, phone if user is found to be logged in
           buyer: {
-            name: widgetConfig.user_name,
-            email: widgetConfig.user_email,
-            phone: widgetConfig.user_phone || '+91',
+            name: outreach.config.widgetConfig.user_name,
+            email: outreach.config.widgetConfig.user_email,
+            phone: outreach.config.widgetConfig.user_phone || '+91',
             company: ''
           },
           activeTab: 'outreach-selectItems',
@@ -203,12 +203,7 @@ $(function() {
             confirm: {
               id: 'outreach-confirm',
               label: 'Confirm',
-              complete: false,
-              section: {
-                cashReceiptURL: '',
-                eventTitle: widgetConfig.paymentDesc,
-                eventHashtag: widgetConfig.event_hashtag,
-              }
+              complete: false
             }
           },
           isCartEmpty: function(){
@@ -496,7 +491,6 @@ $(function() {
         createOrder: function(proceed_to_payment) {
           outreach.ractive.fire('eventAnalytics', 'order creation', 'createOrder');
           var create_order_url;
-          var items;
           if (!proceed_to_payment) {
             create_order_url = outreach.config.resources.inquiry.urlFor();
           }
@@ -580,5 +574,10 @@ $(function() {
       });
     });
   };
+
+  window.outreach_widget.init = function(widgetConfig) {
+    outreach.init(widgetConfig);
+  };
+
 });
 {% endraw %}
