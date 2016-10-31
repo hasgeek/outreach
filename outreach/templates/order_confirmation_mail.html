@@ -141,74 +141,10 @@
     <p>Hello {{ order.buyer_fullname }},</p>
 
     <p class="content">Thank you for supporting {{ order.item_collection.title }}.</p>
-
-    {% if order.is_confirmed %}
-      <p class="content">We'll mail you the cash receipt within one business day.</p>
-    {% else %}
-      <p class="content">We will contact you within the next 24 hours by phone or email.</p>
-    {% endif %}
-
-    {% if order.is_confirmed %}
-      <h1 class="header">Order details</h1>
-      
-      <div class="company-details">
-        {%- if org.details.get('logo') %}
-          <div class="logo">
-           <img src="{{org.details.get('logo')}}"/>
-          </div>
-        {%- endif %}
-
-        <div class="address">
-          {%- if org.details.get('address') %}
-            {{org.details.get('address') | safe}}
-          {%- endif %}
-          {%- if org.details.get('cin') %}
-            <p>CIN: {{org.details.get('cin')}}</p>
-          {%- endif %}
-          {%- if org.details.get('pan') %}
-            <p>PAN No: {{org.details.get('pan')}}</p>
-          {%- endif %}
-          {%- if org.details.get('service_tax_no') %}
-            <p>Service Tax No: {{org.details.get('service_tax_no')}}</p>
-          {%- endif %}
-          {%- if org.details.get('website') %}
-            <p><a href="{{org.details.get('website')}}">{{org.details.get('website')}}</a></p>
-          {%- endif %}
-          <p><a href="mailto:{{org.contact_email}}">{{org.contact_email}}</a></p>
-        </div>    
-      </div>
-      
-      <div class="customer">
-        <table class="customer-details">
-          <tr>
-            <th class="gray" colspan="2">Bill To</th>
-          </tr>
-          <tr>
-            <td class="gray">Name</td>
-            <td>{{ order.buyer_fullname }}</td>
-          </tr>
-          <tr>
-            <td class="gray">Email</td>
-            <td>{{ order.buyer_email }}</td>
-          </tr>
-          <tr>
-            <td class="gray">Phone</td>
-            <td>{{ order.buyer_phone }}</td>
-          </tr>
-        </table>
-
-        <table class="details">
-          <tr>
-            <td class="gray">Date</td>
-            <td>{{ order.paid_at | invoice_date('%d %b %Y') }}</td>
-          </tr>
-        </table>  
-      </div>
-    {% else %}
-      <h1 class="header">Interested items</h1>     
-    {% endif %}
+    <p class="content">We will contact you within the next 24 hours by phone or email.</p>
       
     {% if line_items|length > 0 %}
+      <h1 class="header">Interested items</h1>     
       <table class="items">    
         <tr>
           <th>Item No:</th>
