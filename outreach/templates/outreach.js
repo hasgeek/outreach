@@ -1,4 +1,4 @@
-window.Boxoffice = {
+window.outreach = {
   // Initial config setup
   config:{
     baseURL: "{{base_url}}",
@@ -42,10 +42,10 @@ f})(window,document);"undefined"!==typeof module&&module.exports&&(module.export
 $(function() {
   Ractive.DEBUG = false;
 
-  var boxoffice = window.Boxoffice;
-  boxoffice.util = {};
+  var outreach = window.outreach;
+  outreach.util = {};
 
-  boxoffice.util.getQueryParams = function() {
+  outreach.util.getQueryParams = function() {
     // Returns an array of query parameters
     // Eg: "?code=xxx&cody=yyy" -> ["code=xxx", "code=yyy"]
     var searchStr = window.location.search.split('?');
@@ -55,13 +55,13 @@ $(function() {
     return [];
   };
 
-  boxoffice.util.getUtmHeaders = function(){
+  outreach.util.getUtmHeaders = function(){
     /*
     Checks for utm_* headers and returns a hash with the headers set to values.
     If a header occurs more than once, the values are joined to form a single comma-separated string
     */
     var utm_headers = ['utm_campaign', 'utm_source', 'utm_medium', 'utm_id', 'utm_content', 'utm_term', 'gclid'];
-    var query_params = boxoffice.util.getQueryParams();
+    var query_params = outreach.util.getQueryParams();
     var utm_values = {};
     var param;
     query_params.forEach(function(query_param){
@@ -80,74 +80,62 @@ $(function() {
     return utm_values;
   };
 
-  boxoffice.util.formatDateTime = function(valid_upto) {
+  outreach.util.formatDateTime = function(valid_upto) {
     // Returns date in the format 00:00:00 AM, Sun Apr 10 2016
     var date = new Date(valid_upto);
     return date.toLocaleTimeString(['en-US'], {hour: '2-digit', minute: '2-digit'}) + ", " + date.toDateString();
   };
 
-  boxoffice.util.formatDate = function(valid_upto) {
+  outreach.util.formatDate = function(valid_upto) {
     // Returns date in the format Apr 10 2016
     var date = new Date(valid_upto);
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   };
 
-  boxoffice.initResources = function(config) {
+  outreach.initResources = function(config) {
     this.config.resources = {
       itemCollection: {
         method: 'GET',
         urlFor: function(){
-          return boxoffice.config.baseURL + '/ic/' + config.ic;
+          return outreach.config.baseURL + '/ic/' + config.ic;
         }
       },
       kharcha: {
         method: 'POST',
         urlFor: function(){
-          return boxoffice.config.baseURL + '/order/kharcha';
+          return outreach.config.baseURL + '/order/kharcha';
         }
       },
       createOrder: {
         method: 'POST',
         urlFor: function(){
-          return boxoffice.config.baseURL + '/ic/' + config.ic + '/order';
+          return outreach.config.baseURL + '/ic/' + config.ic + '/order';
         }
       },
       inquiry: {
         method: 'POST',
         urlFor: function(){
-          return boxoffice.config.baseURL + '/ic/' + config.ic + '/inquiry';
-        }
-      },
-      payment: {
-        method: 'POST',
-        urlFor: function(id){
-          return boxoffice.config.baseURL + '/order/' + id + '/payment';
-        }
-      },
-      free: {
-        method: 'POST',
-        urlFor: function(id){
-          return boxoffice.config.baseURL + '/order/' + id + '/free';
+          return outreach.config.baseURL + '/ic/' + config.ic + '/inquiry';
         }
       }
     };
   };
 
-  boxoffice.orderStatus = {
+  outreach.orderStatus = {
     'Inquiry': 0,
     'PurchaseOrder': 1,
     'SalesOrder': 2
   };
 
-  boxoffice.init = function(widgetConfig) {
+  outreach.init = function(widgetConfig) {
     // Config variables provided by the client embedding the widget
     this.widgetConfig = widgetConfig;
-    boxoffice.initResources({
+    outreach.initResources({
       ic: widgetConfig.itemCollection
     });
 
     $.get({
-      url: boxoffice.config.resources.itemCollection.urlFor(),
+      url: outreach.config.resources.itemCollection.urlFor(),
       crossDomain: true,
       headers: {'X-Requested-With': 'XMLHttpRequest'},
       dataType: 'json',
@@ -168,15 +156,15 @@ $(function() {
             'final_amount': undefined,
             'item_image': item.images,
             'item_description': item.description,
-            'price_valid_upto': boxoffice.util.formatDate(item.price_valid_upto),
+            'price_valid_upto': outreach.util.formatDate(item.price_valid_upto),
             'quantity_available': item.quantity_available,
             'is_available': item.is_available
           });
         });
       });
 
-      boxoffice.ractive = new Ractive({
-        el: '#boxoffice-widget',
+      outreach.ractive = new Ractive({
+        el: '#outreach-widget',
         template: data.html,
         data: {
           refund_policy : data.refund_policy,
@@ -189,8 +177,8 @@ $(function() {
             line_items: lineItems,
             final_amount: 0.0,
             readyToCheckout: false,
-            org_name: boxoffice.widgetConfig.org || boxoffice.config.orgName,
-            org_logo: boxoffice.widgetConfig.razorpayBanner || boxoffice.config.razorpayBanner
+            org_name: outreach.widgetConfig.org || outreach.config.orgName,
+            org_logo: outreach.widgetConfig.razorpayBanner || outreach.config.razorpayBanner
           },
           // Prefill name, email, phone if user is found to be logged in
           buyer: {
@@ -199,10 +187,10 @@ $(function() {
             phone: widgetConfig.user_phone || '+91',
             company: ''
           },
-          activeTab: 'boxoffice-selectItems',
+          activeTab: 'outreach-selectItems',
           tabs: {
             selectItems: {
-              id: 'boxoffice-selectItems',
+              id: 'outreach-selectItems',
               label: 'Select',
               complete: false,
               section: {
@@ -210,8 +198,8 @@ $(function() {
               },
               errorMsg: ''
             },
-            payment: {
-              id: 'boxoffice-payment',
+            contact: {
+              id: 'outreach-contact',
               label: 'Details',
               complete: false,
               section: {
@@ -219,7 +207,7 @@ $(function() {
               errorMsg: ''
             },
             confirm: {
-              id: 'boxoffice-confirm',
+              id: 'outreach-confirm',
               label: 'Confirm',
               complete: false,
               section: {
@@ -230,7 +218,7 @@ $(function() {
             }
           },
           isCartEmpty: function(){
-            return boxoffice.ractive.get('order.line_items').filter(function(line_item){
+            return outreach.ractive.get('order.line_items').filter(function(line_item){
               return line_item.quantity > 0;
             }).length === 0;
           },
@@ -262,64 +250,64 @@ $(function() {
           }
         },
         scrollTop: function(){
-          //Scroll the page up to top of boxoffice widget.
+          //Scroll the page up to top of outreach widget.
           $('html,body').animate({
-            scrollTop: $("#" + boxoffice.ractive.el.id).offset().top
+            scrollTop: $("#" + outreach.ractive.el.id).offset().top
           }, '300');
         },
         selectItems: function(event) {
           // Makes the 'Select Items' tab active
           event.original.preventDefault();
-          boxoffice.ractive.calculateOrder();
-          boxoffice.ractive.fire('eventAnalytics', 'edit order', 'Edit order');
-          boxoffice.ractive.set('cartSideBarOpen', false);
-          boxoffice.ractive.set('activeTab', boxoffice.ractive.get('tabs.selectItems.id'));
-          boxoffice.ractive.scrollTop();
+          outreach.ractive.calculateOrder();
+          outreach.ractive.fire('eventAnalytics', 'edit order', 'Edit order');
+          outreach.ractive.set('cartSideBarOpen', false);
+          outreach.ractive.set('activeTab', outreach.ractive.get('tabs.selectItems.id'));
+          outreach.ractive.scrollTop();
         },
         expandText: function(event, item_name, action) {
           // Expand or collapse description text of an item
           event.original.preventDefault();
-          var lineItems = boxoffice.ractive.get('order.line_items');
+          var lineItems = outreach.ractive.get('order.line_items');
           lineItems.forEach(function(lineItem) {
             if (lineItem.item_name === item_name) {
               lineItem.expand = action;
             }
           });
-          boxoffice.ractive.set('order.line_items', lineItems);
+          outreach.ractive.set('order.line_items', lineItems);
         },
         updateOrder: function(event, item_name, quantityAvailable, increment) {
           // Increments or decrements a line item's quantity
           event.original.preventDefault();
-          var lineItems = boxoffice.ractive.get('order.line_items');
+          var lineItems = outreach.ractive.get('order.line_items');
           lineItems.forEach(function(lineItem) {
             if (lineItem.item_name === item_name) {
               if (increment) {
                 if (lineItem.quantity < quantityAvailable) {
                   lineItem.quantity += 1;
                   //CartAnimation: For cart visibility & to show order final amount
-                  boxoffice.ractive.cartAnimation();
+                  outreach.ractive.cartAnimation();
                 }
-                boxoffice.ractive.fire('eventAnalytics', 'add ticket', item_name);
+                outreach.ractive.fire('eventAnalytics', 'add ticket', item_name);
               } else if (lineItem.quantity !== 0) {
                 lineItem.quantity -= 1;
-                boxoffice.ractive.fire('eventAnalytics', 'remove ticket', item_name);
+                outreach.ractive.fire('eventAnalytics', 'remove ticket', item_name);
               }
             }
             if (lineItem.quantity === 0) {
               lineItem.final_amount = 0;
             }
           });
-          boxoffice.ractive.set({
+          outreach.ractive.set({
             'order.line_items': lineItems,
             'tabs.selectItems.errorMsg': '',
             'tabs.selectItems.isLoadingFail': false,
           });
-          boxoffice.ractive.calculateOrder();
+          outreach.ractive.calculateOrder();
         },
         openCart: function(event, action) {
           //Slide open or close cart
           event.original.preventDefault();
-          boxoffice.ractive.set('cartSideBarOpen', action);
+          outreach.ractive.set('cartSideBarOpen', action);
           var body;
           if(action) {
             body = document.getElementsByTagName("body")[0];
@@ -332,22 +320,27 @@ $(function() {
         },
         cartAnimation: function() {
           //To show order final amount next to the cart btn
-          boxoffice.ractive.set('order.show_cart_total', true);
-          window.setTimeout(function() {
-            boxoffice.ractive.set('order.show_cart_total', false);
-          }, 3000)
+          if(outreach.ractive.get('order.show_cart_total')) {
+            outreach.ractive.set('order.show_cart_total', false);
+            window.setTimeout(function() {
+              outreach.ractive.set('order.show_cart_total', true);
+            }, 500);
+          }
+          else {
+            outreach.ractive.set('order.show_cart_total', true);
+          }
         },
         calculateOrder: function() {
           // Asks the server for the order's calculation and updates the order
-          var lineItems = boxoffice.ractive.get('order.line_items').filter(function(line_item) {
+          var lineItems = outreach.ractive.get('order.line_items').filter(function(line_item) {
             return line_item.quantity > 0;
           });
 
           if (lineItems.length) {
-            boxoffice.ractive.set('tabs.selectItems' + '.loadingPrice', true);
+            outreach.ractive.set('tabs.selectItems' + '.loadingPrice', true);
 
             $.post({
-              url: boxoffice.config.resources.kharcha.urlFor(),
+              url: outreach.config.resources.kharcha.urlFor(),
               crossDomain: true,
               dataType: 'json',
               headers: {'X-Requested-With': 'XMLHttpRequest'},
@@ -366,7 +359,7 @@ $(function() {
               retries: 5,
               retryInterval: 5000,
               success: function(data) {
-                var line_items = boxoffice.ractive.get('order.line_items');
+                var line_items = outreach.ractive.get('order.line_items');
                 var readyToCheckout = false;
                 line_items.forEach(function(line_item){
                   // TODO: Refactor this to iterate through data.line_items
@@ -388,7 +381,7 @@ $(function() {
                 });
 
                 if (readyToCheckout) {
-                  boxoffice.ractive.set({
+                  outreach.ractive.set({
                     'order.line_items': line_items,
                     'order.final_amount': data.order.final_amount,
                     'tabs.selectItems.errorMsg': ''
@@ -397,11 +390,11 @@ $(function() {
                   //Currently online transaction limit is 5 lakhs, so disable checkout option
                   // if(data.order.final_amount > 500000) {
                   //   readyToCheckout = false;
-                  //   boxoffice.ractive.set('tabs.selectItems.errorMsg', "Orders for above Rs 5 lakh cannot be processed online. Please contact us to complete your order");
+                  //   outreach.ractive.set('tabs.selectItems.errorMsg', "Orders for above Rs 5 lakh cannot be processed online. Please contact us to complete your order");
                   // }
                 }
 
-                boxoffice.ractive.set({
+                outreach.ractive.set({
                   'tabs.selectItems.loadingPrice': false,
                   'order.readyToCheckout': readyToCheckout
                 });
@@ -410,7 +403,7 @@ $(function() {
                 var ajaxLoad = this;
                 ajaxLoad.retries -= 1;
                 if (response.readyState === 4) {
-                  boxoffice.ractive.set({
+                  outreach.ractive.set({
                     'tabs.selectItems.errorMsg': JSON.parse(response.responseText).message,
                     'tabs.selectItems.isLoadingFail': true,
                     'order.readyToCheckout': false
@@ -418,7 +411,7 @@ $(function() {
                 }
                 else if (response.readyState === 0) {
                   if (ajaxLoad.retries < 0) {
-                    boxoffice.ractive.set({
+                    outreach.ractive.set({
                       'tabs.selectItems.errorMsg': "Unable to connect. Please try again later.",
                       'tabs.selectItems.isLoadingFail': true,
                       'order.readyToCheckout': false
@@ -432,7 +425,7 @@ $(function() {
               }
             });
           } else {
-            boxoffice.ractive.set({
+            outreach.ractive.set({
               'order.final_amount': 0,
               'order.readyToCheckout': false
             });
@@ -441,35 +434,22 @@ $(function() {
         getContactDetails: function(event) {
           // Transitions the widget to the Contact Details form
           event.original.preventDefault();
-          boxoffice.ractive.openCart(event, false);
-          boxoffice.ractive.set({
-            'tabs.payment.errorMsg': '',
-            'order.status': boxoffice.orderStatus.Inquiry,
-            'activeTab': boxoffice.ractive.get('tabs.payment.id')
+          outreach.ractive.openCart(event, false);
+          outreach.ractive.set({
+            'tabs.contact.errorMsg': '',
+            'order.status': outreach.orderStatus.Inquiry,
+            'activeTab': outreach.ractive.get('tabs.contact.id')
           });
-          boxoffice.ractive.scrollTop();
-        },
-        continue: function(event) {
-          // Transitions the widget to the Buyer form
-          event.original.preventDefault();
-          boxoffice.ractive.openCart(event, false);
-          boxoffice.ractive.fire('eventAnalytics', 'checkout', 'Checkout');
-          boxoffice.ractive.set({
-            'tabs.payment.errorMsg': '',
-            'order.status': boxoffice.orderStatus.PurchaseOrder,
-            'tabs.selectItems.complete': true,
-            'activeTab': boxoffice.ractive.get('tabs.payment.id')
-          });
-          boxoffice.ractive.scrollTop();
+          outreach.ractive.scrollTop();
         },
         checkout: function(event, proceed_to_payment) {
           var validationConfig = [{
             name: 'name',
-            rules: 'required'
+            rules: 'required|max_length[80]'
           },
           {
             name: 'company',
-            rules: 'required'
+            rules: 'required|max_length[80]'
           },
           {
             name: 'email',
@@ -482,13 +462,13 @@ $(function() {
 
           var formValidator = new FormValidator('buyer-form', validationConfig, function(errors, event) {
             event.preventDefault();
-            boxoffice.ractive.set('tabs.payment.errormsg', '');
+            outreach.ractive.set('tabs.contact.errormsg', '');
             if (errors.length > 0) {
-              boxoffice.ractive.set('tabs.payment.errormsg.' + errors[0].name, errors[0].message);
-              boxoffice.ractive.scrollTop();
+              outreach.ractive.set('tabs.contact.errormsg.' + errors[0].name, errors[0].message);
+              outreach.ractive.scrollTop();
             } else {
-              boxoffice.ractive.set('tabs.payment.loadingOrder', true);
-              boxoffice.ractive.createOrder(proceed_to_payment);
+              outreach.ractive.set('tabs.contact.loadingOrder', true);
+              outreach.ractive.createOrder(proceed_to_payment);
             }
           });
 
@@ -498,7 +478,7 @@ $(function() {
           formValidator.registerCallback('validate_phone', function(phone) {
             //Remove all punctations (except +) and letters
             phone = phone.replace(/[^0-9+]/g,'');
-            boxoffice.ractive.set('buyer.phone', phone);
+            outreach.ractive.set('buyer.phone', phone);
 
             var validPhone = /^\+[0-9]+$/;
 
@@ -520,14 +500,14 @@ $(function() {
           });
         },
         createOrder: function(proceed_to_payment) {
-          boxoffice.ractive.fire('eventAnalytics', 'order creation', 'createOrder');
+          outreach.ractive.fire('eventAnalytics', 'order creation', 'createOrder');
           var create_order_url;
           var items;
           if (proceed_to_payment) {
-            create_order_url = boxoffice.config.resources.createOrder.urlFor();
+            create_order_url = outreach.config.resources.createOrder.urlFor();
           }
           else {
-            create_order_url = boxoffice.config.resources.inquiry.urlFor();
+            create_order_url = outreach.config.resources.inquiry.urlFor();
           }
           $.post({
             url: create_order_url,
@@ -535,12 +515,12 @@ $(function() {
             dataType: 'json',
             data: JSON.stringify({
               buyer:{
-                email: boxoffice.ractive.get('buyer.email'),
-                fullname: boxoffice.ractive.get('buyer.name'),
-                phone: boxoffice.ractive.get('buyer.phone'),
-                company: boxoffice.ractive.get('buyer.company')
+                email: outreach.ractive.get('buyer.email'),
+                fullname: outreach.ractive.get('buyer.name'),
+                phone: outreach.ractive.get('buyer.phone'),
+                company: outreach.ractive.get('buyer.company')
               },
-              line_items: boxoffice.ractive.get('order.line_items').filter(function(line_item) {
+              line_items: outreach.ractive.get('order.line_items').filter(function(line_item) {
                 return line_item.quantity > 0;
               }).map(function(line_item) {
                 return {
@@ -548,7 +528,7 @@ $(function() {
                   quantity: line_item.quantity
                 };
               }),
-              order_session: boxoffice.util.getUtmHeaders(),
+              order_session: outreach.util.getUtmHeaders(),
             }),
             headers: {'X-Requested-With': 'XMLHttpRequest'},
             contentType: 'application/json',
@@ -556,24 +536,9 @@ $(function() {
             retries: 5,
             retryInterval: 5000,
             success: function(data) {
-              boxoffice.ractive.set('order.status', boxoffice.orderStatus.PurchaseOrder);
-              if(proceed_to_payment) {
-                boxoffice.ractive.set({
-                  'tabs.payment.loadingOrder': false,
-                  'tabs.payment.errorMsg' : '',
-                  'order.order_id': data.order_id,
-                  'order.access_token': data.order_access_token,
-                  'order.final_amount': data.final_amount
-                });
-                if (boxoffice.ractive.get('order.final_amount') === 0){
-                  boxoffice.ractive.completeFreeOrder(data.free_order_url);
-                } else {
-                  boxoffice.ractive.capturePayment(data.payment_url, data.razorpay_payment_id);
-                }
-                boxoffice.ractive.scrollTop();
-              }
-              else {
-                boxoffice.ractive.confirmContactDetails();
+              outreach.ractive.set('order.status', outreach.orderStatus.PurchaseOrder);
+              if(!proceed_to_payment) {
+                outreach.ractive.confirmContactDetails();
               }
             },
             error: function(response) {
@@ -582,17 +547,17 @@ $(function() {
               var resp = JSON.parse(response.responseText);
               if (response.readyState === 4) {
                 if (resp.error_type === 'order_calculation') {
-                  boxoffice.ractive.calculateOrder();
+                  outreach.ractive.calculateOrder();
                 }
-                boxoffice.ractive.set({
-                  'tabs.payment.errorMsg': resp.message,
-                  'tabs.payment.loadingOrder': false
+                outreach.ractive.set({
+                  'tabs.contact.errorMsg': resp.message,
+                  'tabs.contact.loadingOrder': false
                 });
               } else if (response.readyState === 0) {
                 if(ajaxLoad.retries < 0) {
-                  boxoffice.ractive.set({
-                    'tabs.payment.errorMsg': "Unable to connect. Please try again later.",
-                    'tabs.payment.loadingOrder': false
+                  outreach.ractive.set({
+                    'tabs.contact.errorMsg': "Unable to connect. Please try again later.",
+                    'tabs.contact.loadingOrder': false
                   });
                 } else {
                   setTimeout(function() {
@@ -604,151 +569,16 @@ $(function() {
           });
         },
         confirmContactDetails: function() {
-          boxoffice.ractive.scrollTop();
-          boxoffice.ractive.set({
-            'tabs.payment.errorMsg': '',
-            'activeTab': boxoffice.ractive.get('tabs.confirm.id')
-          });
-        },
-        capturePayment: function(paymentUrl, razorpay_payment_id){
-          // Opens the Razorpay widget, on success calls confirmPayment
-          boxoffice.ractive.fire('eventAnalytics', 'initiate payment', 'capturePayment');
-          var razorPayOptions = {
-            "key": boxoffice.config.razorpayKeyId,
-            //Razorpay expects amount in paisa
-            "amount": boxoffice.ractive.get('order.final_amount') * 100,
-            "name": boxoffice.widgetConfig.org || boxoffice.config.orgName,
-            "description": boxoffice.widgetConfig.paymentDesc,
-            "image": boxoffice.widgetConfig.razorpayBanner || boxoffice.config.razorpayBanner,
-            // Order id is for razorpay's reference, useful for querying
-            "notes": {
-              "order_id": boxoffice.ractive.get('order.order_id')
-            },
-            "handler": function (data) {
-              boxoffice.ractive.confirmPayment(paymentUrl, data.razorpay_payment_id);
-            },
-            "prefill": {
-              "name": boxoffice.ractive.get('buyer.name'),
-              "email": boxoffice.ractive.get('buyer.email'),
-              "contact": boxoffice.ractive.get('buyer.phone')
-            },
-            "theme": {
-              "color": "#F37254"
-            },
-            "modal": {
-              "ondismiss": function() {
-                boxoffice.ractive.fire('eventAnalytics', 'dismiss payment form', 'razorPay close');
-              }
-            }
-          };
-          var razorpay = new Razorpay(razorPayOptions);
-          razorpay.open();
-        },
-        confirmPayment: function(paymentUrl, paymentID) {
-          // Sends the paymentId to the server, transitions the state to 'Confirm'
-          boxoffice.ractive.set('tabs.payment.loadingPaymentConfirmation', true);
-          boxoffice.ractive.fire('eventAnalytics', 'capture payment', 'confirmPayment');
-          $.post({
-            url: boxoffice.config.resources.payment.urlFor(boxoffice.ractive.get('order.order_id')),
-            crossDomain: true,
-            dataType: 'json',
-            headers: {'X-Requested-With': 'XMLHttpRequest'},
-            contentType: 'application/json',
-            data: JSON.stringify({pg_paymentid: paymentID}),
-            timeout: 60000,
-            retries: 5,
-            retryInterval: 10000,
-            success: function(data) {
-              boxoffice.ractive.set({
-                'tabs.payment.loadingPaymentConfirmation': false,
-                'tabs.payment.complete': true,
-                'activeTab': boxoffice.ractive.get('tabs.confirm.id'),
-                'order.status': boxoffice.orderStatus.SalesOrder,
-                'tabs.confirm.section.cashReceiptURL': boxoffice.config.resources.receipt.urlFor(boxoffice.ractive.get('order.access_token')),
-                'tabs.confirm.section.attendeeAssignmentURL': boxoffice.config.resources.attendeeAssignment.urlFor(boxoffice.ractive.get('order.access_token'))
-              });
-              boxoffice.ractive.fire('eventAnalytics', 'booking complete', 'confirmPayment success');
-            },
-            error: function(response) {
-              var ajaxLoad = this;
-              var responseText = JSON.parse(response.responseText);
-              var errorMsg;
-              ajaxLoad.retries -= 1;
-              if (response.readyState === 4) {
-                boxoffice.ractive.set({
-                  'tabs.payment.errorMsg': responseText.error_description,
-                  'tabs.payment.loadingPaymentConfirmation': false
-                });
-              }
-              else if (response.readyState === 0) {
-                if (ajaxLoad.retries < 0) {
-                  errorMsg = "Unable to connect. Please write to us at support@hasgeek.com with your order id " + boxoffice.ractive.get('order.order_id') + ".";
-                  boxoffice.ractive.set({
-                    'tabs.payment.errorMsg': errorMsg,
-                    'tabs.payment.loadingPaymentConfirmation': false
-                  });
-                } else {
-                  setTimeout(function() {
-                    $.post(ajaxLoad);
-                  }, ajaxLoad.retryInterval);
-                }
-              }
-            }
-          });
-        },
-        completeFreeOrder: function(url) {
-          boxoffice.ractive.set('tabs.payment.loadingPaymentConfirmation', true);
-          $.post({
-            url: boxoffice.config.resources.free.urlFor(boxoffice.ractive.get('order.order_id')),
-            crossDomain: true,
-            dataType: 'json',
-            headers: {'X-Requested-With': 'XMLHttpRequest'},
-            contentType: 'application/json',
-            timeout: 5000,
-            retries: 5,
-            retryInterval: 5000,
-            success: function(data) {
-              boxoffice.ractive.set({
-                'tabs.payment.loadingPaymentConfirmation': false,
-                'tabs.payment.complete': true,
-                'activeTab': boxoffice.ractive.get('tabs.confirm.id'),
-                'order.status': boxoffice.orderStatus.SalesOrder,
-                'tabs.confirm.section.cashReceiptURL': boxoffice.config.resources.receipt.urlFor(boxoffice.ractive.get('order.access_token')),
-                'tabs.confirm.section.attendeeAssignmentURL': boxoffice.config.resources.attendeeAssignment.urlFor(boxoffice.ractive.get('order.access_token'))
-              });
-              boxoffice.ractive.fire('eventAnalytics', 'booking complete', 'completeFreeOrder success');
-            },
-            error: function(response) {
-              var ajaxLoad = this;
-              ajaxLoad.retries -= 1;
-              var errorMsg;
-              if (response.readyState === 4) {
-                errorMsg = JSON.parse(response.responseText).message + ". Sorry, something went wrong. We will get in touch with you shortly. This is your order id " + boxoffice.ractive.get('order.order_id') + ".";
-                boxoffice.ractive.set({
-                  'tabs.payment.errorMsg': errorMsg,
-                  'tabs.payment.loadingPaymentConfirmation': false
-                });
-              }
-              else if (response.readyState === 0) {
-                if (ajaxLoad.retries < 0) {
-                  errorMsg = "Unable to connect. Please write to us at support@hasgeek.com with your order id " + boxoffice.ractive.get('order.order_id') + ".";
-                  boxoffice.ractive.set({
-                    'tabs.payment.errorMsg': errorMsg,
-                    'tabs.payment.loadingPaymentConfirmation': false
-                  });
-                } else {
-                  setTimeout(function() {
-                    $.post(ajaxLoad);
-                  }, ajaxLoad.retryInterval);
-                }
-              }
-            }
+          outreach.ractive.scrollTop();
+          outreach.ractive.set({
+            'tabs.contact.errorMsg': '',
+            'activeTab': outreach.ractive.get('tabs.confirm.id')
           });
         },
         oncomplete: function() {
-          boxoffice.ractive.on('eventAnalytics', function(userAction, label) {
-            if (typeof boxoffice.ractive.get('sendEventHits') === "undefined") {
-              boxoffice.ractive.set('sendEventHits', 0);
+          outreach.ractive.on('eventAnalytics', function(userAction, label) {
+            if (typeof outreach.ractive.get('sendEventHits') === "undefined") {
+              outreach.ractive.set('sendEventHits', 0);
               userAction = 'First interaction';
             }
             if (typeof ga !== "undefined") {

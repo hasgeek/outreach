@@ -1,5 +1,5 @@
 {%raw%}
-<div class="payment-progress-wrapper payment-stages-bg" id="payment-stages">
+<div class="progress-wrapper">
   <ul class="progress-indicator">
     {{#tabs:tab}}
       <li class="indicator {{#if id === activeTab}}active{{/if}} {{#if complete}}completed{{/if}}">
@@ -7,21 +7,23 @@
       </li>
     {{/}}
   </ul>
-</div><!--eof payment-box-progress-wrapper -->
-<div class="payment-stages-wrapper">
+</div><!--eof progress-wrapper -->
+<div class="widget-wrapper">
   {{#tabs:tab}}
-    {{#if id === 'boxoffice-selectItems' && id === activeTab}}
-      <div id='{{id}}' class="boxoffice-section ticket-selection-content clearfix" intro-outro='fly:{"x":0,"y":"0"}'>
-        <div class="cart-btn-wrapper">
-          <button class="cart-btn" on-click="openCart(event, true)">
-            <i class="fa fa-phone"></i>
-          </button>
-          {{#if order.show_cart_total}}
-            <p class="cart-total" on-click="openCart(event, true)" intro-outro='fly:{"x":50,"y":"0",easing:"ease",delay:200}'>Total <span>{{ formatToIndianRupee(order.final_amount) }}</span> <i class="fa  fa-arrow-circle-right"></i></p>
-          {{/if}}
-        </div>
+    {{#if id === 'outreach-selectItems' && id === activeTab}}
+      <div id='{{id}}' class="outreach-section ticket-selection-content clearfix" intro-outro='fly:{"x":0,"y":"0"}'>
+        {{#if order.readyToCheckout}}
+          <div class="cart-btn-wrapper">
+            <button class="cart-btn" on-click="openCart(event, true)">
+              <i class="fa fa-arrow-right"></i>
+            </button>
+            {{#if order.show_cart_total}}
+              <p class="cart-total" on-click="openCart(event, true)" intro-outro='fly:{"x":50,"y":"0",easing:"ease",delay:200}'>Total <span>{{ formatToIndianRupee(order.final_amount) }}</span></p>
+            {{/if}}
+          </div>
+        {{/if}}
         
-        <button class="boxoffice-button boxoffice-button-info contact-btn" on-click="getContactDetails(event)">
+        <button class="outreach-button outreach-button-info contact-btn" on-click="getContactDetails(event)">
           <i class="fa fa-phone"></i> Contact sales
         </button>
 
@@ -80,9 +82,9 @@
                             {{/if}}
                             <div class="add-item-btn">
                               {{#if line_item.quantity > 0}}
-                                <button class="boxoffice-button boxoffice-button-action" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)"><i class="fa fa-heart"></i> Interested</button>
+                                <button class="outreach-button outreach-button-action" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)"><i class="fa fa-heart"></i> Interested</button>
                               {{else}}
-                                <button class="boxoffice-button boxoffice-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">I am interested</button>
+                                <button class="outreach-button outreach-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">I am interested</button>
                               {{/if}}
                             </div>
                           {{else}}
@@ -131,7 +133,7 @@
               {{/}}
               <p class="price">Total <span class="final-amount">{{ formatToIndianRupee(order.final_amount) }}</span></p>
             </div>
-            <button class="boxoffice-button boxoffice-button-info cart-footer-btn" on-click="getContactDetails(event)">
+            <button class="outreach-button outreach-button-info cart-footer-btn" on-click="getContactDetails(event)">
               <i class="fa fa-phone"></i> Contact sales
             </button>
           </div>
@@ -151,11 +153,8 @@
         {{/}}
 
       </div>
-    {{elseif id === 'boxoffice-payment' && id === activeTab}}
-      {{#loadingPaymentConfirmation}}
-        <div class="loader payment-confirmation"><i class="fa fa-spinner fa-spin fa-3x"></i></div>
-      {{/}}
-      <div id='{{id}}' class="boxoffice-section clearfix" intro='fly:{"x":0,"y":"0"}'>
+    {{elseif id === 'outreach-contact' && id === activeTab}}
+      <div id='{{id}}' class="outreach-section clearfix" intro='fly:{"x":0,"y":"0"}'>
         <form role="form" name="buyer-form" class="buyer-details">
           {{#if order.status == 0}}
             <p class="buyer-form-title">Contact Details</p>
@@ -217,14 +216,9 @@
 
           <div class="proceed-button-wrapper">
             {{#if order.status == 0}}
-              <button class="boxoffice-button boxoffice-button-info edit-order" type="button" on-click="selectItems(event)">Go back</button>
-              <button type="submit" class="boxoffice-button boxoffice-button-action" {{#loadingOrder}}disabled{{/}} on-click="checkout(event, false)">
+              <button class="outreach-button outreach-button-info edit-order" type="button" on-click="selectItems(event)">Go back</button>
+              <button type="submit" class="outreach-button outreach-button-action" {{#loadingOrder}}disabled{{/}} on-click="checkout(event, false)">
               Call me {{#loadingOrder}}<i class="fa fa-spinner fa-spin" intro='fly:{"x":0,"y":"0"}'>{{/}}
-              </button>
-            {{else}}
-              <button class="boxoffice-button boxoffice-button-info edit-order" type="button" on-click="selectItems(event)">Edit order</button>
-              <button type="submit" class="boxoffice-button boxoffice-button-action" {{#loadingOrder}}disabled{{/}} on-click="checkout(event, true)">
-                Checkout {{#loadingOrder}}<i class="fa fa-spinner fa-spin" intro='fly:{"x":0,"y":"0"}'>{{/}}
               </button>
             {{/if}}
           </div>
@@ -233,23 +227,13 @@
           {{/}}
         </form> 
       </div>
-    {{elseif id === 'boxoffice-confirm' && id === activeTab}}
-      <div id='{{id}}' class="boxoffice-section clearfix" intro='fly:{"x":600,"y":"0"}'>
-        {{#if order.status == 2}}
-          {{#section}}
-            <p class="confirmation-icon"><i class="fa fa-check-circle"></i></p>
-            <p class="confirmation-header">Thank you for your order!</p>
-            <div class="confirmation-msg">
-              <p>We'll mail you the cash receipt within one business day.</p>
-            </div>
-          {{/section}}
-        {{else}}
-          <p class="confirmation-icon"><i class="fa fa-thumbs-up"></i></p>
-          <p class="confirmation-header">Thank you for your interest!</p>
-          <div class="confirmation-msg">
-            <p>We will contact you within the next 24 hours by phone or email.</p>
-          </div>
-        {{/if}}
+    {{elseif id === 'outreach-confirm' && id === activeTab}}
+      <div id='{{id}}' class="outreach-section clearfix" intro='fly:{"x":600,"y":"0"}'>
+        <p class="confirmation-icon"><i class="fa fa-thumbs-up"></i></p>
+        <p class="confirmation-header">Thank you for your interest!</p>
+        <div class="confirmation-msg">
+          <p>We will contact you within the next 24 hours by phone or email.</p>
+        </div>
       </div>      
     {{/if}}
   {{/}}
@@ -257,12 +241,12 @@
 {%endraw%}
 
 <style>
-  #boxoffice-widget {
+  #outreach-widget {
     max-width: 1170px;
     margin: auto;
     padding-top: 50px;
   }
-  .boxoffice-button {
+  .outreach-button {
     border-width: 0px 0px 3px;
     border-style: solid;
     border-radius: 5px;
@@ -272,12 +256,12 @@
     display: inline-block;
     margin: 0;
   }
-  .boxoffice-button-action {
+  .outreach-button-action {
     background-color: #5CB85C;
     border-color: #4CAE4C;
     margin-left: 5px;
   }
-  .boxoffice-button-info {
+  .outreach-button-info {
     background-color: #5BC0DE;
     border-color: #46B8DA;
   }
@@ -292,11 +276,17 @@
     display: table
   }
 
-  .payment-progress-wrapper {
+  .progress-wrapper {
     background-color: #eee;
     padding: 20px;
     border: 2px solid #ccc;
     border-radius: 15px 15px 0 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .widget-wrapper {
+    overflow: hidden;
+    position: relative;
   }
   .progress-indicator {
       display: -webkit-box;
@@ -369,11 +359,7 @@
       background-color: #337AB7;
       border-color: #122a3f
   }
-  .payment-stages-wrapper {
-    overflow: hidden;
-    position: relative;
-  }
-  .boxoffice-section {
+  .outreach-section {
     padding: 15px;
     border: 2px solid #ccc;
     border-top-width: 0;
@@ -693,13 +679,13 @@
     font-size: 13px;
     padding-left: 5px;
   }
-  .boxoffice-section .separator {
+  .outreach-section .separator {
     height: 1px;
     margin: 0 -20px 20px;
     border: 0;
     border-top: 1px solid #ccc;
   }
-  .boxoffice-section .separator.thick {
+  .outreach-section .separator.thick {
     border-top: 3px solid #ccc;
     margin: 0 -15px 0;
   }
@@ -981,12 +967,6 @@
   .edit-order {
     margin-right: 10px;
   }
-  .loader.payment-confirmation .fa-spin {
-    position: relative;
-    color: #000;
-    top: 43%;
-    left: 48%;
-  }
   .confirmation-icon {
     font-size: 50px;
     color: green;
@@ -1022,16 +1002,5 @@
   .name {
     text-align: left;
     margin: 0;
-  }
-  .receipt-button {
-    margin: 10px;
-    display: inline-block;
-  }
-  .receipt-button:hover,
-  .receipt-button:focus {
-    background-color: inherit;
-    color: inherit;
-    border-color: inherit;
-    border-bottom: 3px solid;
   }
 </style>
