@@ -4,6 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 from flask import request, jsonify, make_response
 from coaster.views import load_models
+from baseframe import _
 from .. import app
 from utils import xhr_only, cors
 from ..models import db, LineItem, SaleItem, ItemCollection, User, Order, OrderSession
@@ -105,5 +106,5 @@ def create_order_inquiry(item_collection):
             order_session_form.populate_obj(order_session)
             db.session.add(order_session)
     db.session.commit()
-    send_confirmation_mail.delay(order.id, "Thank you for your interest!")
+    send_confirmation_mail.delay(order.id, _("Thank you for your interest!"))
     return make_response(jsonify(order_id=order.id, order_access_token=order.access_token), 201)
