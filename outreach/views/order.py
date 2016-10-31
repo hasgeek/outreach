@@ -88,10 +88,10 @@ def create_order_inquiry(item_collection):
         line_item_tups = LineItem.calculate([{'item_id': li_form.data.get('item_id')}
             for li_form in line_item_forms
                 for x in range(li_form.data.get('quantity'))])
-        for idx, line_item_tup in enumerate(line_item_tups):
+        for idx, line_item_tup in enumerate(line_item_tups, start=1):
             item = SaleItem.query.get(line_item_tup.item_id)
             line_item = LineItem(order=order, sale_item=item,
-                seq=idx+1,
+                seq=idx,
                 ordered_at=datetime.utcnow(),
                 base_amount=line_item_tup.base_amount,
                 final_amount=line_item_tup.base_amount)
