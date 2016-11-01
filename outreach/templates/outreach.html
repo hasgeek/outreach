@@ -12,14 +12,12 @@
   {{#tabs:tab}}
     {{#if id === 'outreach-selectItems' && id === activeTab}}
       <div id='{{id}}' class="outreach-section ticket-selection-content clearfix" intro-outro='fly:{"x":0,"y":"0"}'>
-        {{#if order.readyToCheckout}}
-          <div class="cart-btn-wrapper">
-            <button class="cart-btn" on-click="openCart(event, true)">
+        {{#if order.show_cart_btn}}
+          <div class="cart-btn-wrapper" intro-outro='fly:{"x":-50,"y":"0",easing:"ease",delay:200}' on-click="openCart(event, true)">
+            <p class="cart-total">Total <span>{{ formatToIndianRupee(order.final_amount) }}</span></p>
+            <button class="cart-btn">
               <i class="fa fa-arrow-right"></i>
             </button>
-            {{#if order.show_cart_total}}
-              <p class="cart-total" on-click="openCart(event, true)" intro-outro='fly:{"x":50,"y":"0",easing:"ease",delay:200}'>Total <span>{{ formatToIndianRupee(order.final_amount) }}</span></p>
-            {{/if}}
           </div>
         {{/if}}
         
@@ -391,6 +389,7 @@
     color: #333;
     position: relative;
     font-size: 18px;
+    font-weight: bold;
     width: 100%;
     margin: 15px 0;
     padding: 0 0 15px;
@@ -449,6 +448,7 @@
     background-color: #fff;
     min-height: 196px;
     margin: 15px 0;
+    min-width: 300px;
   }
   @media (min-width: 768px) {
     .card {
@@ -695,15 +695,15 @@
     right: 25px;
     z-index: 998;
   }
-  .cart-btn ,
-  .cart-total {
+  .cart-btn-wrapper .cart-btn ,
+  .cart-btn-wrapper .cart-total {
     color: #fff;
     background-color: #005580;
     border-color: #00334d;
-    border-radius: 5px;
     border-width: 0px 0px 3px;
     border-style: solid;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
+    float: left;
   }
   .cart-btn {
     font-size: 35px;
@@ -713,11 +713,9 @@
     padding: 0 9px;
     margin: 0;
     height: 53px;
+    border-radius: 0 5px 5px 0;
   }
   .cart-total {
-    position: absolute;
-    right: 45px;
-    top: 0;
     min-width: 165px;
     border-radius: 5px 0 0 5px;
     padding: 15px;

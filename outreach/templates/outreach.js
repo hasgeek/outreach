@@ -274,7 +274,7 @@ $(function() {
                 if (lineItem.quantity < quantityAvailable) {
                   lineItem.quantity += 1;
                   //CartAnimation: For cart visibility & to show order final amount
-                  outreach.ractive.cartAnimation();
+                  outreach.ractive.animateCartBtn();
                 }
                 outreach.ractive.fire('eventAnalytics', 'add ticket', item_name);
               } else if (lineItem.quantity !== 0) {
@@ -293,6 +293,18 @@ $(function() {
           });
           outreach.ractive.calculateOrder();
         },
+        animateCartBtn: function() {
+          //Animate cart btn. Incase cart btn is visible, hide for 500ms and display again.
+          if(outreach.ractive.get('order.show_cart_btn')) {
+            outreach.ractive.set('order.show_cart_btn', false);
+            window.setTimeout(function() {
+              outreach.ractive.set('order.show_cart_btn', true);
+            }, 500);
+          }
+          else {
+            outreach.ractive.set('order.show_cart_btn', true);
+          }
+        },
         openCart: function(event, action) {
           //Slide open or close cart
           event.original.preventDefault();
@@ -301,22 +313,11 @@ $(function() {
           if(action) {
             body = document.getElementsByTagName("body")[0];
             body.style.overflow = "hidden";
+            outreach.ractive.scrollTop();
           }
           else {
             body = document.getElementsByTagName("body")[0];
             body.style.overflow = "";
-          }
-        },
-        cartAnimation: function() {
-          //To show order final amount next to the cart btn
-          if(outreach.ractive.get('order.show_cart_total')) {
-            outreach.ractive.set('order.show_cart_total', false);
-            window.setTimeout(function() {
-              outreach.ractive.set('order.show_cart_total', true);
-            }, 500);
-          }
-          else {
-            outreach.ractive.set('order.show_cart_total', true);
           }
         },
         calculateOrder: function() {
