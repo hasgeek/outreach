@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from .order import *
+from .razorpay import *
