@@ -15,6 +15,7 @@ def jsonify_item(item):
             'title': item.title,
             'id': item.id,
             'images': [{'url': image.url, 'title': image.title} for image in item.images],
+            'blurb': item.blurb,
             'description': item.description.text,
             'quantity_available': item.get_available_quantity(),
             'is_available': item.is_available(),
