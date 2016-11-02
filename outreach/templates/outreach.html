@@ -102,7 +102,7 @@
               {{#loadingPrice && !isLoadingFail}}
                 <div class="loader"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
               {{/}}
-              <p class="price">Total <span class="final-amount">{{ formatToIndianRupee(order.final_amount) }}</span></p>
+              <p class="price">Total {{ formatToIndianRupee(order.final_amount) }}</p>
             </div>
             <button class="outreach-button outreach-button-info cart-footer-btn" on-click="getContactDetails(event)">
               <i class="fa fa-phone"></i> Contact sales
@@ -567,7 +567,7 @@
     border-width: 0 0 2px;
     overflow-x: hidden;
     overflow-y: auto;
-    max-height: 75%;
+    max-height: 80%;
   }
   .cart-list {
     padding: 0 0 0 15px;
@@ -594,7 +594,7 @@
     bottom: 0;
     right: 0;
     background-color: #eee;
-    height: 25%;
+    height: 20%;
   }
   .cart-footer-btn {
     width: 100%;
@@ -644,7 +644,6 @@
     color: #b94a48;
   }
   .buyer-details {
-    max-width: 650px;
     margin: auto;
   }
   .buyer-details .group {
@@ -754,9 +753,6 @@
   }
   .booked-ticket-qty .rupee-sign {
     font-size: 11px;
-  }
-  .final-amount{
-    float: right;
   }
   .price {
     font-size: 15px;
