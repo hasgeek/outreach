@@ -1,13 +1,4 @@
 {%raw%}
-<div class="progress-wrapper">
-  <ul class="progress-indicator">
-    {{#tabs:tab}}
-      <li class="indicator {{#if id === activeTab}}active{{/if}} {{#if complete}}completed{{/if}}">
-        <span class="bubble"></span>{{ label }}<br>
-      </li>
-    {{/}}
-  </ul>
-</div><!--eof progress-wrapper -->
 <div class="widget-wrapper">
   {{#tabs:tab}}
     {{#if id === 'outreach-selectItems' && id === activeTab}}
@@ -20,20 +11,10 @@
             </button>
           </div>
         {{/if}}
-        
-        <button class="outreach-button outreach-button-info contact-btn" on-click="getContactDetails(event)">
-          <i class="fa fa-phone"></i> Contact sales
-        </button>
 
         <div class="inventory-wrapper">
           {{#section.categories}}
             <div id="{{name}}" class="categories">
-              <div class="category-title">
-                <h1 class="category-heading">{{title}}</h1>
-                {{#description}}
-                  <div class="category-description">{{{ description }}}</div>
-                {{/}}
-              </div>
               <div class="category-items">
               {{#items}}{{# { item: . } }}
                 {{#order.line_items}} {{# { line_item: . } }}
@@ -98,11 +79,12 @@
               {{/}}{{/items}}
               </div>
             </div>
-            {{#if @index < section.categories.length-1}}
-              <hr class="separator thick">
-            {{/if}}
           {{/section.categories}}
         </div>
+
+        <button class="outreach-button outreach-button-info contact-btn" on-click="getContactDetails(event)">
+          <i class="fa fa-phone"></i> Contact sales
+        </button>
 
         <div class="cart-content {{#cartSideBarOpen}}cart-open{{/}}" on-click="openCart(event, false)">
           <div class="cart-body clearfix">
@@ -239,11 +221,6 @@
 {%endraw%}
 
 <style>
-  #outreach-widget {
-    max-width: 1170px;
-    margin: auto;
-    padding-top: 50px;
-  }
   .outreach-button {
     border-width: 0px 0px 3px;
     border-style: solid;
@@ -273,106 +250,23 @@
     content: " "
     display: table
   }
-
-  .progress-wrapper {
-    background-color: #eee;
-    padding: 20px;
-    border: 2px solid #ccc;
-    border-radius: 15px 15px 0 0;
-    overflow: hidden;
-    position: relative;
-  }
   .widget-wrapper {
     overflow: hidden;
     position: relative;
   }
-  .progress-indicator {
-      display: -webkit-box;
-      display: -moz-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      margin: 0;
-      padding: 0;
-      font-size: 80%;
-      text-transform: uppercase
-  }
-  .progress-indicator>li {
-      -ms-flex: 1;
-      -webkit-flex: 1;
-      -moz-flex: 1;
-      flex: 1;
-      list-style: none;
-      text-align: center;
-      width: auto;
-      padding: 0;
-      margin: 0;
-      position: relative;
-      text-overflow: ellipsis;
-      color: #333;
-      display: block
-  }
-  .progress-indicator>li.completed,
-  .progress-indicator>li.completed .bubble {
-      color: #65d074
-  }
-  .progress-indicator>li .bubble {
-      border-radius: 1000px;
-      width: 20px;
-      height: 20px;
-      background-color: #bbb;
-      display: block;
-      margin: 0 auto .5em;
-      border-bottom: 1px solid #888
-  }
-  .progress-indicator>li .bubble:after,
-  .progress-indicator>li .bubble:before {
-      display: block;
-      position: absolute;
-      top: 9px;
-      width: 100%;
-      height: 3px;
-      content: '';
-      background-color: #bbb
-  }
-  .progress-indicator>li.completed .bubble,
-  .progress-indicator>li.completed .bubble:after,
-  .progress-indicator>li.completed .bubble:before {
-      background-color: #65d074;
-      border-color: #247830
-  }
-  .progress-indicator>li .bubble:before {
-      left: 0
-  }
-  .progress-indicator>li .bubble:after {
-      right: 0
-  }
-  .progress-indicator>li.active,
-  .progress-indicator>li.active .bubble {
-      color: #337AB7
-  }
-  .progress-indicator>li.active .bubble,
-  .progress-indicator>li.active .bubble:after,
-  .progress-indicator>li.active .bubble:before {
-      background-color: #337AB7;
-      border-color: #122a3f
-  }
   .outreach-section {
-    padding: 15px;
-    border: 2px solid #ccc;
     border-top-width: 0;
     min-height: 450px;
   }
   .contact-btn {
-    margin: 0 0 15px;
-    float: right;
+    margin: 10px 0;
   }
   .contact-btn .fa,
   .cart-footer-btn .fa {
     position: relative;
     top: 1px;
   }
-  @media (min-width: 768px) {
+  @media (min-width: 768px and max-width: 1200px){
     .contact-btn {
       position: absolute;
       float: none;
@@ -412,15 +306,10 @@
     margin: 15px 0 0 0;
     line-height: 1.65em;
   }
+  .category-items {
+    text-align: left;
+  }
   @media (min-width: 768px) {
-    .categories {
-      display: -webkit-flex;
-      display: flex;
-      margin: -1px 0 0 -15px;
-    }
-    .inventory-wrapper div.categories:first-child {
-      margin-top: -15px;
-    }
     .category-title {
       min-width: 320px;
       width: 320px;
@@ -433,11 +322,6 @@
       padding: 0 15px;
     }
   }
-  @media (min-width: 768px) {
-    .category-items {
-      margin-top: 80px;
-    }
-  }
   .card {
     display: inline-block;
     vertical-align: top;
@@ -447,30 +331,13 @@
     border-radius: 5px;
     background-color: #fff;
     min-height: 196px;
-    margin: 15px 0;
+    margin: 5px 2px 20px;
     min-width: 300px;
-  }
-  @media (min-width: 768px) {
-    .card {
-      margin: 15px 0 15px 15px;
-    }
-  }
-  @media (min-width: 900px) {
-    .category-items {
-      text-align: center;
-    }
-    .card {
-      width: 80%;
-    }
+    max-width: 100%
   }
   @media (min-width: 1200px) {
-    .category-items {
-      text-align: left;
-    }
     .card {
-      width: 48%;
-      margin: 15px 0 15px 2%;
-      min-height: 634px;
+      max-width: 400px;
     }
   }
   .ticket-selected {
@@ -521,6 +388,7 @@
   .ticket-description ul {
     padding: 0 15px;
     margin: 0;
+    list-style: inside;
   }
   .ticket-description .fa {
     padding-right: 5px;
@@ -692,7 +560,7 @@
   .cart-btn-wrapper {
     position: fixed;
     bottom: 10px;
-    right: 25px;
+    right: 15px;
     z-index: 998;
   }
   .cart-btn-wrapper .cart-btn ,
@@ -725,6 +593,11 @@
     text-align: center;
     z-index: 998;
     cursor: pointer;
+  }
+  @media (min-width: 768px) {
+    .cart-btn-wrapper {
+      right: 26px;
+    }
   }
   @media (min-width: 1024px) {
     .cart-btn-wrapper {
