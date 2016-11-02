@@ -127,13 +127,9 @@
     {{elseif id === 'outreach-contact' && id === activeTab}}
       <div id='{{id}}' class="outreach-section clearfix" intro='fly:{"x":0,"y":"0"}'>
         <form role="form" name="buyer-form" class="buyer-details">
-          {{#if order.status == 0}}
-            <p class="buyer-form-title">Contact Details</p>
-          {{else}}
-            <p class="buyer-form-title">Billing Details</p>
-          {{/if}}
+          <p class="buyer-form-title">Contact details</p>
           <div class="group">
-            <input class="group-input {{#buyer.name}}filled{{/}}" type="text" name="name" value="{{buyer.name}}">
+            <input class="group-input {{#buyer.name}}filled{{/}}" type="text" name="name" value="{{buyer.name}}" autofocus>
             <span class="bar"></span>
             <label class="group-label">Name</label>
             {{#errormsg.name}}<p class="form-error-msg">{{ errormsg.name }}</p>{{/}}
@@ -159,12 +155,7 @@
 
           {{#if !isCartEmpty()}}
             <div class="checkout-confirmation">
-              {{#if order.status == 0}}
-                <p class="summary">Your're interested in</p>
-              {{else}}
-                <p class="summary">Booking Summary</p>
-              {{/if}}
-
+              <p class="summary">You're interested in</p>
               <ol class="cart-list">
                 {{#order.line_items}} {{# { line_item: . } }}
                   {{#if line_item.quantity > 0 }}
@@ -662,7 +653,7 @@
   }
   .buyer-details .group-input {
     font-size: 16px;
-    padding: 10px 10px 10px 5px;
+    padding: 10px 10px 10px 0;
     display: block;
     width: 100%;
     border: none;
@@ -680,7 +671,7 @@
     font-weight: normal;
     position: absolute;
     pointer-events: none;
-    left: 5px;
+    left: 0;
     top: 10px;
     transition: 0.2s ease all;
     -moz-transition: 0.2s ease all;
@@ -739,16 +730,16 @@
     left: 20px;
   }
   .buyer-form-title, .summary {
-    text-align: center;
+    text-align: left;
     font-size: 20px;
-    margin: 20px 0;
+    margin: 20px 0 30px;
   }
   .checkout-confirmation {
     padding: 0;
   }
   .item-summary {
     border-bottom: 1px dotted #CCC;
-    padding: 5px 0;
+    padding: 5px;
   }
   .booked-ticket-title {
     font-size: 16px;
