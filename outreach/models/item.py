@@ -43,7 +43,7 @@ class SaleItem(BaseScopedNameMixin, db.Model):
         order_by=seq,
         collection_class=ordering_list('seq', count_from=1)))
     #: Call to action text
-    blurb = db.Column(db.UnicodeText, nullable=False, default=u'')
+    blurb = MarkdownColumn('blurb', default=u"", nullable=False)
     description = MarkdownColumn('description', default=u"", nullable=False)
 
     def current_price(self):
