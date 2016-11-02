@@ -38,27 +38,18 @@
                         {{/if}}
 
                         <div class="ticket-description">
-                          {{#if line_item.item_description.length > description_max_ch_count}}
-                            {{#if !expand}}
-                              {{{ truncateDescription(line_item.item_description) }}}
-                              <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, true)"><i class="fa fa-caret-down"></i> Read More</a>
-                            {{else}}
-                              {{{ line_item.item_description }}}
-                              <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, false)"><i class="fa fa-caret-up"></i> Close</a>
-                            {{/if}}
+                          {{{ line_item.item_blurb }}}
+                          {{#if !line_item.expand}}
+                            <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, true)"><i class="fa fa-caret-down"></i> Read More</a>
                           {{else}}
                             {{{ line_item.item_description }}}
+                            <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, false)"><i class="fa fa-caret-up"></i> Hide</a>
                           {{/if}}
                           <p><sup>*</sup>Prices are exclusive of tax.</p>
                         </div>
 
                         <div class="ticket-price-qty clearfix">
                           {{#if line_item.is_available}}
-                            {{#if line_item.quantity_available < 5}}
-                              <p class="few-ticket">
-                                <span class="available-count">Only {{line_item.quantity_available}} available</span>
-                              </p>
-                            {{/if}}
                             <div class="add-item-btn">
                               {{#if line_item.quantity > 0}}
                                 <button class="outreach-button outreach-button-action" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)"><i class="fa fa-heart"></i> Interested</button>
@@ -278,49 +269,8 @@
     clear: both;
     margin: 0 0 15px;
   }
-  .category-heading {
-    border-bottom: 3px solid #aaa;
-    color: #333;
-    position: relative;
-    font-size: 18px;
-    font-weight: bold;
-    width: 100%;
-    margin: 15px 0;
-    padding: 0 0 15px;
-    z-index: 1;
-    text-transform: uppercase;
-  }
-  @media (min-width: 480px) {
-    .category-heading {
-      font-size: 20px;
-    }
-  }
-  @media (min-width: 768px) {
-    .category-heading {
-      font-size: 30px;
-    }
-  }
-  .category-description {
-    font-size: 15px;
-    text-align: left;
-    margin: 15px 0 0 0;
-    line-height: 1.65em;
-  }
   .category-items {
     text-align: left;
-  }
-  @media (min-width: 768px) {
-    .category-title {
-      min-width: 320px;
-      width: 320px;
-      background-color: #eee;
-    }
-    .category-heading {
-      padding: 15px;
-    }
-    .category-description {
-      padding: 0 15px;
-    }
   }
   .card {
     display: inline-block;
@@ -383,12 +333,11 @@
     margin-top: 15px;
   }
   .ticket-description p {
-    margin: 7px 0;
+    margin: 7px 0 0;
   }
   .ticket-description ul {
     padding: 0 15px;
     margin: 0;
-    list-style: inside;
   }
   .ticket-description .fa {
     padding-right: 5px;

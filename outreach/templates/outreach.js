@@ -212,14 +212,6 @@ $(function() {
               return line_item.quantity > 0;
             }).length === 0;
           },
-          truncateDescription: function(description) {
-            var max_character_count = this.get('description_max_ch_count');
-            if (description.length < max_character_count) {
-              return description;
-            } else {
-              return description.slice(0, max_character_count) + '<span>...</span>';
-            }
-          },
           formatToIndianRupee: function(value) {
             // Takes a floating point value and formats it to the Indian currency format
             // with the rupee sign.
