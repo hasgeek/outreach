@@ -42,6 +42,8 @@ class SaleItem(BaseScopedNameMixin, db.Model):
     category = db.relationship(Category, backref=db.backref('sale_items', cascade='all, delete-orphan',
         order_by=seq,
         collection_class=ordering_list('seq', count_from=1)))
+    #: Call to action text
+    blurb = db.Column(db.UnicodeText, nullable=False, default=u'')
     description = MarkdownColumn('description', default=u"", nullable=False)
 
     def current_price(self):

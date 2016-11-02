@@ -145,6 +145,7 @@ def upgrade():
         sa.Column('seq', sa.Integer(), nullable=False),
         sa.Column('item_collection_id', sqlalchemy_utils.types.uuid.UUIDType(), nullable=False),
         sa.Column('category_id', sa.Integer(), nullable=False),
+        sa.Column('blurb', sa.UnicodeText(), nullable=False),
         sa.Column('description_text', sa.UnicodeText(), nullable=False),
         sa.Column('description_html', sa.UnicodeText(), nullable=False),
         sa.Column('name', sa.Unicode(length=250), nullable=False),
