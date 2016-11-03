@@ -555,7 +555,7 @@ $(function() {
           outreach.ractive.on('eventAnalytics', function(userAction, label) {
             if (typeof outreach.ractive.get('sendEventHits') === "undefined") {
               outreach.ractive.set('sendEventHits', 0);
-              userAction = 'First interaction';
+              userAction = 'First interaction with outreach';
             }
             if (typeof ga !== "undefined") {
               ga('send', { hitType: 'event', eventCategory: 'sponsor', eventAction: userAction, eventLabel: label});
