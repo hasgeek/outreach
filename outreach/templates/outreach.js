@@ -241,10 +241,10 @@ $(function() {
           // Makes the 'Select Items' tab active
           event.original.preventDefault();
           outreach.ractive.calculateOrder();
-          outreach.ractive.fire('eventAnalytics', 'edit order', 'Edit order');
           outreach.ractive.set('cartSideBarOpen', false);
           outreach.ractive.set('activeTab', outreach.ractive.get('tabs.selectItems.id'));
           outreach.ractive.scrollTop();
+          outreach.ractive.fire('eventAnalytics', 'edit order', 'Edit order');
         },
         expandText: function(event, item_name, action) {
           // Expand or collapse description text of an item
@@ -269,10 +269,10 @@ $(function() {
                   //CartAnimation: For cart visibility & to show order final amount
                   outreach.ractive.animateCartBtn();
                 }
-                outreach.ractive.fire('eventAnalytics', 'add ticket', item_name);
+                outreach.ractive.fire('eventAnalytics', 'add item', item_name);
               } else if (lineItem.quantity !== 0) {
                 lineItem.quantity -= 1;
-                outreach.ractive.fire('eventAnalytics', 'remove ticket', item_name);
+                outreach.ractive.fire('eventAnalytics', 'remove item', item_name);
               }
             }
             if (lineItem.quantity === 0) {
@@ -307,6 +307,7 @@ $(function() {
             body = document.getElementsByTagName("body")[0];
             body.style.overflow = "hidden";
             outreach.ractive.scrollTop();
+            outreach.ractive.fire('eventAnalytics', 'open cart', 'openCart');
           }
           else {
             body = document.getElementsByTagName("body")[0];
@@ -369,12 +370,6 @@ $(function() {
                     'order.final_amount': data.order.final_amount,
                     'tabs.selectItems.errorMsg': ''
                   });
-
-                  //Currently online transaction limit is 5 lakhs, so disable checkout option
-                  // if(data.order.final_amount > 500000) {
-                  //   readyToCheckout = false;
-                  //   outreach.ractive.set('tabs.selectItems.errorMsg', "Orders for above Rs 5 lakh cannot be processed online. Please contact us to complete your order");
-                  // }
                 }
 
                 outreach.ractive.set({
@@ -424,6 +419,7 @@ $(function() {
             'activeTab': outreach.ractive.get('tabs.contact.id')
           });
           outreach.ractive.scrollTop();
+          outreach.ractive.fire('eventAnalytics', 'contact sales', 'getContactDetails');
         },
         checkout: function(event, proceed_to_payment) {
           var validationConfig = [{
@@ -483,7 +479,7 @@ $(function() {
           });
         },
         createOrder: function(proceed_to_payment) {
-          outreach.ractive.fire('eventAnalytics', 'order creation', 'createOrder');
+          outreach.ractive.fire('eventAnalytics', 'submit contact details', 'createOrder');
           var create_order_url;
           if (!proceed_to_payment) {
             create_order_url = outreach.config.resources.inquiry.urlFor();
@@ -553,6 +549,7 @@ $(function() {
             'tabs.contact.errorMsg': '',
             'activeTab': outreach.ractive.get('tabs.confirm.id')
           });
+          outreach.ractive.fire('eventAnalytics', 'confirmation', 'confirmContactDetails');
         },
         oncomplete: function() {
           outreach.ractive.on('eventAnalytics', function(userAction, label) {
@@ -561,7 +558,7 @@ $(function() {
               userAction = 'First interaction';
             }
             if (typeof ga !== "undefined") {
-              ga('send', { hitType: 'event', eventCategory: 'ticketing', eventAction: userAction, eventLabel: label});
+              ga('send', { hitType: 'event', eventCategory: 'sponsor', eventAction: userAction, eventLabel: label});
             }
           });
         }
