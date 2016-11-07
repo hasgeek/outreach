@@ -561,7 +561,6 @@ $(function() {
               ga('send', { hitType: 'event', eventCategory: 'sponsor', eventAction: userAction, eventLabel: label});
             }
           });
-          outreach.ractive.set('order.show_cart_btn', true);
         }
       });
     });
