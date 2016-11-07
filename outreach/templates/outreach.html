@@ -4,10 +4,9 @@
     {{#if id === 'outreach-selectItems' && id === activeTab}}
       <div id='{{id}}' class="outreach-section ticket-selection-content clearfix" intro-outro='fly:{"x":0,"y":"0"}'>
         {{#if order.show_cart_btn}}
-          <div class="cart-btn-wrapper" intro-outro='fly:{"x":-50,"y":"0",easing:"ease",delay:200}' on-click="openCart(event, true)">
-            <p class="cart-total">Total <span>{{ formatToIndianRupee(order.final_amount) }}</span></p>
-            <button class="cart-btn">
-              <i class="fa fa-arrow-right"></i>
+          <div class="cart-btn-wrapper">
+            <button class="outreach-button outreach-button-action" intro-outro='fly:{"x":-50,"y":"0",easing:"ease",delay:200}' on-click="getContactDetails(event)">
+              Continue <i class="fa fa-arrow-right"></i>
             </button>
           </div>
         {{/if}}
@@ -72,10 +71,6 @@
             </div>
           {{/section.categories}}
         </div>
-
-        <button class="outreach-button outreach-button-info contact-btn" on-click="getContactDetails(event)">
-          <i class="fa fa-phone"></i> Contact sales
-        </button>
 
         <div class="cart-content {{#cartSideBarOpen}}cart-open{{/}}" on-click="openCart(event, false)">
           <div class="cart-body clearfix">
@@ -318,6 +313,9 @@
     width: 70px;
     height: auto;
     border-radius: 5px;
+  }
+  .ticket-image-thumbnail {
+    margin-right: 10px;
   }
   .ticket-description {
     font-size: 15px;
