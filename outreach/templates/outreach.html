@@ -3,14 +3,6 @@
   {{#tabs:tab}}
     {{#if id === 'outreach-selectItems' && id === activeTab}}
       <div id='{{id}}' class="outreach-section ticket-selection-content clearfix" intro-outro='fly:{"x":0,"y":"0"}'>
-        {{#if order.show_cart_btn}}
-          <div class="cart-btn-wrapper">
-            <button class="outreach-button outreach-button-action" intro-outro='fly:{"x":-50,"y":"0",easing:"ease",delay:200}' on-click="getContactDetails(event)">
-              Continue <i class="fa fa-arrow-right"></i>
-            </button>
-          </div>
-        {{/if}}
-
         <div class="inventory-wrapper">
           {{#section.categories}}
             <div id="{{name}}" class="categories">
@@ -18,17 +10,22 @@
               {{#items}}{{# { item: . } }}
                 {{#order.line_items}} {{# { line_item: . } }}
                   {{#if line_item.item_name === item.name }}
-                    <div class="card clearfix {{#line_item.quantity}}ticket-selected{{/}}" id="{{line_item.item_name}}">
-
-                      <div class="ticket-details">
+                    <div class="card-wrapper clearfix" id="{{line_item.item_name}}">              
+                      <div class="card {{#line_item.quantity}}ticket-selected{{/}}">
                         <p class="ticket-title">{{ line_item.item_title }}</p>
                         <div class="ticket-price-wrapper">
                           <p class="ticket-price">{{ formatToIndianRupee(line_item.base_price) }}<sup>*</sup></p>
                         </div>
 
                         {{#if line_item.item_image}}
-                          <div class="ticket-image">
-                            <img src="{{line_item.item_image[0].url}}" alt="{{line_item.item_image[0].title}}">
+                          <div class="carousel slide" data-ride="carousel">
+                          <div class="carousel-inner" role="listbox">
+                            {{#line_item.item_image:index}}
+                              <div class="ticket-image item {{#if index === 0}}active{{/if}}">
+                                <img src="{{url}}" alt="{{title}}">
+                              </div>
+                            {{/}}
+                            </div>
                           </div>
                         {{else}}
                           <div class="org-logo">
@@ -38,11 +35,13 @@
 
                         <div class="ticket-description">
                           {{{ line_item.item_blurb }}}
-                          {{#if !line_item.expand}}
-                            <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, true)"><i class="fa fa-caret-down"></i> Read More</a>
-                          {{else}}
-                            {{{ line_item.item_description }}}
-                            <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, false)"><i class="fa fa-caret-up"></i> Hide</a>
+                          {{#if line_item.item_description}}
+                            {{#if !line_item.expand}}
+                              <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, true)"><i class="fa fa-caret-down"></i> Read More</a>
+                            {{else}}
+                              {{{ line_item.item_description }}}
+                              <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, false)"><i class="fa fa-caret-up"></i> Hide</a>
+                            {{/if}}
                           {{/if}}
                           <p><sup>*</sup>Prices are exclusive of tax.</p>
                         </div>
@@ -73,41 +72,12 @@
         </div>
 
         <button class="outreach-button outreach-button-action contact-btn" on-click="getContactDetails(event)">
-          <i class="fa fa-phone"></i> Contact sales
+          {{#if !order.is_cart_empty}}
+            <span>Continue <i class="fa fa-arrow-right"></i></span>
+          {{else}}
+            <i class="fa fa-phone"></i> Contact sales
+          {{/if}}
         </button>
-
-        <div class="cart-content {{#cartSideBarOpen}}cart-open{{/}}" on-click="openCart(event, false)">
-          <div class="cart-body clearfix">
-            <p class="cart-title">
-              <button class="close-button" on-click="openCart(event, false)"><i class="fa fa-angle-double-right"></i></button>
-              <span>Cart</span>
-            </p>
-            <ol class="cart-list">
-              {{#order.line_items}} {{# { line_item: . } }}
-                {{#if line_item.quantity > 0 }}
-                  <li class="item-summary">
-                    <span class="booked-ticket-title">{{ line_item.item_title }}</span>
-                    <p class="booked-ticket-qty">{{ formatToIndianRupee(line_item.base_price) }}</p>
-                  </li>
-                {{/if}}
-              {{/}}{{/order.line_items}}
-            </ol>
-            {{#errorMsg }}
-              <p class="stage-error-msg">{{ errorMsg }}</p>
-            {{/}}
-          </div>
-          <div class="cart-footer">
-            <div class="ticket-total {{#loadingPrice}}grey-out{{/}}">
-              {{#loadingPrice && !isLoadingFail}}
-                <div class="loader"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
-              {{/}}
-              <p class="price">Total <span class="final-amount">{{ formatToIndianRupee(order.final_amount) }}</span></p>
-            </div>
-            <button class="outreach-button outreach-button-info cart-footer-btn" on-click="getContactDetails(event)">
-              <i class="fa fa-phone"></i> Contact sales
-            </button>
-          </div>
-        </div>
 
         <div>
           {{#errorMsg }}
@@ -152,7 +122,7 @@
             {{#errormsg.company}}<p class="form-error-msg">{{ errormsg.company }}</p>{{/}}
           </div>
 
-          {{#if !isCartEmpty()}}
+          {{#if !order.is_cart_empty}}
             <div class="checkout-confirmation">
               <p class="summary">You're interested in</p>
               <ol class="cart-list">
@@ -240,10 +210,10 @@
     min-height: 450px;
   }
   .contact-btn {
-    margin: 10px 0;
+    margin: 10px 15px;
+    float: right;
   }
-  .contact-btn .fa,
-  .cart-footer-btn .fa {
+  .contact-btn .fa {
     position: relative;
     top: 1px;
   }
@@ -262,33 +232,42 @@
   .category-items {
     text-align: left;
   }
-  .card {
+  .card-wrapper {
     display: inline-block;
     vertical-align: top;
     float: none;
     background-color: #fff;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
-    border-radius: 5px;
-    background-color: #fff;
-    min-height: 196px;
     margin: 5px 2px 20px;
     min-width: 300px;
-    max-width: 100%
+    max-width: 100%;
+    padding: 15px;
+  }
+  .card {
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+    border-radius: 5px;
+    padding: 15px;
+    min-height: 196px;
+  }
+  @media (min-width: 768px) {
+    .card-wrapper {
+      width: 50%;
+      margin: 0;    
+    }
+    .card {
+      min-height: 520px
+    }
   }
   @media (min-width: 1200px) {
-    .card {
-      max-width: 400px;
+    .card-wrapper {
+      width: 33.3%; 
     }
   }
   .ticket-selected {
     background-color: #f7f6ec;
   }
-  .ticket-details {
-    padding: 0 15px 15px;
-  }
   .ticket-title {
     font-size: 18px;
-    margin: 15px 0;
+    margin: 0 0 15px;
     color: #428bca;
   }
   @media (min-width: 768px) {
@@ -502,108 +481,8 @@
     border-top: 3px solid #ccc;
     margin: 0 -15px 0;
   }
-  .cart-btn-wrapper {
-    position: fixed;
-    bottom: 10px;
-    right: 15px;
-    z-index: 998;
-  }
-  .cart-btn-wrapper .cart-btn ,
-  .cart-btn-wrapper .cart-total {
-    color: #fff;
-    background-color: #005580;
-    border-color: #00334d;
-    border-width: 0px 0px 3px;
-    border-style: solid;
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
-    float: left;
-  }
-  .cart-btn {
-    font-size: 35px;
-    line-height: 1.3;
-    position: relative;
-    z-index: 999;
-    padding: 0 9px;
-    margin: 0;
-    height: 53px;
-    border-radius: 0 5px 5px 0;
-  }
-  .cart-total {
-    min-width: 165px;
-    border-radius: 5px 0 0 5px;
-    padding: 18px 15px 15px;
-    height: 53px;
-    font-size: 15px;
-    line-height: 1.3;
-    text-align: center;
-    z-index: 998;
-    cursor: pointer;
-  }
-  @media (min-width: 768px) {
-    .cart-btn-wrapper {
-      right: 30px;
-    }
-  }
-  .cart-content {
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.3);
-    position: fixed;
-    z-index: 1030;
-    top: 0;
-    bottom: 0;
-    right: -100%;
-    transition: 0.2s ease all;
-    -moz-transition: 0.2s ease all;
-    -webkit-transition: 0.2s ease all;
-  }
-  .cart-open {
-    right: 0;
-  }
-  .cart-body {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    width: 250px;
-    padding: 15px;
-    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.6);
-    bottom: 0px;
-    background-color: #eee;
-    border: 2px solid #ccc;
-    border-width: 0 0 2px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: calc(100% - 130px);
-  }
   .cart-list {
     padding: 0 0 0 15px;
-  }
-  .close-button {
-    border: 0;
-    box-shadow: none;
-    background-color: transparent;
-    margin-right: 5px;
-    font-size: 25px;
-    padding: 0;
-    position: relative;
-    top: -2px;
-  }
-  .cart-title {
-    font-size: 30px;
-    text-align: left;
-    line-height: 1;
-  }
-  .cart-footer {
-    padding: 0 15px;
-    width: 250px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    background-color: #eee;
-    height: 130px;
-  }
-  .cart-footer-btn {
-    width: 100%;
-    margin: 0 0 10px;
   }
   .ticket-total {
     clear: both;
@@ -650,6 +529,7 @@
   }
   .buyer-details {
     margin: auto;
+    max-width: 800px;
   }
   .buyer-details .group {
     position: relative;

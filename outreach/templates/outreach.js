@@ -172,6 +172,7 @@ $(function() {
             line_items: lineItems,
             final_amount: 0.0,
             readyToCheckout: false,
+            is_cart_empty: true,
             org_name: outreach.config.widgetConfig.orgName || outreach.config.orgName,
             org_logo: outreach.config.widgetConfig.eventLogo || outreach.config.orgLogo
           },
@@ -206,11 +207,6 @@ $(function() {
               label: 'Confirm',
               complete: false
             }
-          },
-          isCartEmpty: function(){
-            return outreach.ractive.get('order.line_items').filter(function(line_item){
-              return line_item.quantity > 0;
-            }).length === 0;
           },
           formatToIndianRupee: function(value) {
             // Takes a floating point value and formats it to the Indian currency format
@@ -257,6 +253,11 @@ $(function() {
           });
           outreach.ractive.set('order.line_items', lineItems);
         },
+        isCartEmpty: function(){
+          return outreach.ractive.get('order.line_items').filter(function(line_item){
+            return line_item.quantity > 0;
+          }).length === 0;
+        },
         updateOrder: function(event, item_name, quantityAvailable, increment) {
           // Increments or decrements a line item's quantity
           event.original.preventDefault();
@@ -266,8 +267,6 @@ $(function() {
               if (increment) {
                 if (lineItem.quantity < quantityAvailable) {
                   lineItem.quantity += 1;
-                  //CartAnimation: For cart visibility & to show order final amount
-                  outreach.ractive.animateCartBtn();
                 }
                 outreach.ractive.fire('eventAnalytics', 'add item', item_name);
               } else if (lineItem.quantity !== 0) {
@@ -285,33 +284,12 @@ $(function() {
             'tabs.selectItems.isLoadingFail': false,
           });
           outreach.ractive.calculateOrder();
-        },
-        animateCartBtn: function() {
-          //Animate cart btn. Incase cart btn is visible, hide for 500ms and display again.
-          if(outreach.ractive.get('order.show_cart_btn')) {
-            outreach.ractive.set('order.show_cart_btn', false);
-            window.setTimeout(function() {
-              outreach.ractive.set('order.show_cart_btn', true);
-            }, 500);
+
+          if (outreach.ractive.isCartEmpty()) {
+            outreach.ractive.set('order.is_cart_empty', true);
           }
           else {
-            outreach.ractive.set('order.show_cart_btn', true);
-          }
-        },
-        openCart: function(event, action) {
-          //Slide open or close cart
-          event.original.preventDefault();
-          outreach.ractive.set('cartSideBarOpen', action);
-          var body;
-          if(action) {
-            body = document.getElementsByTagName("body")[0];
-            body.style.overflow = "hidden";
-            outreach.ractive.scrollTop();
-            outreach.ractive.fire('eventAnalytics', 'open cart', 'openCart');
-          }
-          else {
-            body = document.getElementsByTagName("body")[0];
-            body.style.overflow = "";
+            outreach.ractive.set('order.is_cart_empty', false);
           }
         },
         calculateOrder: function() {
@@ -412,7 +390,6 @@ $(function() {
         getContactDetails: function(event) {
           // Transitions the widget to the Contact Details form
           event.original.preventDefault();
-          outreach.ractive.openCart(event, false);
           outreach.ractive.set({
             'tabs.contact.errorMsg': '',
             'order.status': outreach.orderStatus.Inquiry,
