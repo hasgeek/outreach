@@ -529,6 +529,9 @@ $(function() {
           outreach.ractive.fire('eventAnalytics', 'confirmation', 'confirmContactDetails');
         },
         oncomplete: function() {
+          //Start bootstrap carousel
+          $('.carousel').carousel();
+
           outreach.ractive.on('eventAnalytics', function(userAction, label) {
             if (typeof outreach.ractive.get('sendEventHits') === "undefined") {
               outreach.ractive.set('sendEventHits', 0);
