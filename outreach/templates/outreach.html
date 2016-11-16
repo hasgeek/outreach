@@ -71,13 +71,15 @@
           {{/section.categories}}
         </div>
 
-        <button class="outreach-button outreach-button-action contact-btn" on-click="getContactDetails(event)">
-          {{#if !order.is_cart_empty}}
-            <span>Continue <i class="fa fa-arrow-right"></i></span>
-          {{else}}
-            <i class="fa fa-phone"></i> Contact sales
-          {{/if}}
-        </button>
+        <div class="btn-wrapper">
+          <button class="outreach-button outreach-button-action contact-btn" on-click="getContactDetails(event)">
+            {{#if !order.is_cart_empty}}
+              <span>Continue <i class="fa fa-arrow-right"></i></span>
+            {{else}}
+              <i class="fa fa-phone"></i> Contact sales
+            {{/if}}
+          </button>
+        </div>
 
         <div>
           {{#errorMsg }}
@@ -211,7 +213,6 @@
   }
   .contact-btn {
     margin: 10px 15px;
-    float: right;
   }
   .contact-btn .fa {
     position: relative;
@@ -473,7 +474,7 @@
   }
   .outreach-section .separator {
     height: 1px;
-    margin: 0 -20px 20px;
+    margin: 0 0 20px;
     border: 0;
     border-top: 1px solid #ccc;
   }
@@ -501,6 +502,7 @@
   .policy {
     clear: both;
     font-size: 18px;
+    padding: 0 15px;
   }
   .policy p {
     margin: 5px 0;
@@ -530,6 +532,7 @@
   .buyer-details {
     margin: auto;
     max-width: 800px;
+    padding: 0 15px;
   }
   .buyer-details .group {
     position: relative;
@@ -555,11 +558,16 @@
     font-weight: normal;
     position: absolute;
     pointer-events: none;
-    left: 0;
+    left: -15px;
     top: 10px;
     transition: 0.2s ease all;
     -moz-transition: 0.2s ease all;
     -webkit-transition: 0.2s ease all;
+  }
+  @media (min-width: 768px) {
+    .buyer-details .group-label {
+      left: 0;
+    }
   }
   .buyer-details .group-input:focus ~ .group-label,
   .buyer-details .group-input.filled ~ .group-label {
