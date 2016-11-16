@@ -3,64 +3,129 @@
   {{#tabs:tab}}
     {{#if id === 'outreach-selectItems' && id === activeTab}}
       <div id='{{id}}' class="outreach-section ticket-selection-content clearfix" intro-outro='fly:{"x":0,"y":"0"}'>
+
+       {{#if !order.is_cart_empty}}
+        <div class="cart-btn-wrapper">
+          <button class="cart-btn" on-click="openCart(event, true)">
+            <i class="fa fa-shopping-cart"></i>
+          </button>
+        </div>
+        {{/if}}
+
+        <div class="cart-content {{#cartSideBarOpen}}cart-open{{/}}" on-click="openCart(event, false)">
+          <div class="cart-body clearfix">
+            <p class="cart-title">
+              <button class="close-button" on-click="openCart(event, false)"><i class="fa fa-angle-double-right"></i></button>
+              <span>Cart</span>
+            </p>
+            <ol class="cart-list">
+              {{#order.line_items}} {{# { line_item: . } }}
+                {{#if line_item.quantity > 0 }}
+                  <li class="item-summary">
+                    <span class="booked-ticket-title">{{ line_item.item_title }}</span>
+                    <p class="booked-ticket-qty">{{ formatToIndianRupee(line_item.base_price) }}</p>
+                  </li>
+                {{/if}}
+              {{/}}{{/order.line_items}}
+            </ol>
+            {{#errorMsg }}
+              <p class="stage-error-msg">{{ errorMsg }}</p>
+            {{/}}
+          </div>
+          <div class="cart-footer">
+            <div class="ticket-total {{#loadingPrice}}grey-out{{/}}">
+              {{#loadingPrice && !isLoadingFail}}
+                <div class="loader"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+              {{/}}
+              <p class="price">Total <span class="final-amount">{{ formatToIndianRupee(order.final_amount) }}</span></p>
+            </div>
+            <button class="outreach-button outreach-button-action cart-footer-btn" on-click="getContactDetails(event)">
+              <span>Continue</span>
+            </button>
+          </div>
+        </div>
+
         <div class="inventory-wrapper">
           {{#section.categories}}
             <div id="{{name}}" class="categories">
+              <div class="category-title">
+                <h1 class="category-heading">{{title}}</h1>
+                {{#description}}
+                  <div class="category-description">{{{ description }}}</div>
+                {{/}}
+              </div>
               <div class="category-items">
-              {{#items}}{{# { item: . } }}
+              {{#items:item_index}}{{# { item: . } }}
                 {{#order.line_items}} {{# { line_item: . } }}
                   {{#if line_item.item_name === item.name }}
-                    <div class="card-wrapper clearfix" id="{{line_item.item_name}}">              
-                      <div class="card {{#line_item.quantity}}ticket-selected{{/}}">
-                        <p class="ticket-title">{{ line_item.item_title }}</p>
-                        <div class="ticket-price-wrapper">
-                          <p class="ticket-price">{{ formatToIndianRupee(line_item.base_price) }}<sup>*</sup></p>
-                        </div>
+                    <div id="{{line_item.item_name}}" class="card-wrapper{{#if item_index === 0}} featured{{/if}} clearfix">         
+                      <div class="card {{#line_item.quantity}}ticket-selected{{/}} {{#if item_index == 0}}featured{{/if}}">
 
-                        {{#if line_item.item_image}}
-                          <div class="carousel slide" data-ride="carousel">
-                          <div class="carousel-inner" role="listbox">
-                            {{#line_item.item_image:index}}
-                              <div class="ticket-image item {{#if index === 0}}active{{/if}}">
-                                <img src="{{url}}" alt="{{title}}">
+                        <div class="ticket-image-wrapper">
+                          {{#if line_item.item_image}}
+                            <div id="{{line_item.item_name}}-carousel" class="carousel slide" data-ride="carousel" data-interval="false">
+                              {{#line_item.item_image.length > 1}}
+                                <ol class="carousel-indicators">
+                                  {{#line_item.item_image:index}}
+                                    <li data-target="#{{line_item.item_name}}-carousel" data-slide-to="{{index}}" {{#if index === 0}}class="active"{{/if}}></li>
+                                  {{/}}
+                                </ol>
+                              {{/}}
+                              <div class="carousel-inner" role="listbox">
+                                {{#line_item.item_image:index}}
+                                  <div class="carousel-item ticket-image item {{#if index === 0}}active{{/if}}">
+                                    <img src="{{url}}" alt="{{title}}">
+                                  </div>
+                                {{/}}
                               </div>
-                            {{/}}
-                            </div>
-                          </div>
-                        {{else}}
-                          <div class="org-logo">
-                            <img src="{{order.org_logo}}" alt="{{order.org_name}}">
-                          </div>
-                        {{/if}}
-
-                        <div class="ticket-description">
-                          {{{ line_item.item_blurb }}}
-                          {{#if line_item.item_description}}
-                            {{#if !line_item.expand}}
-                              <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, true)"><i class="fa fa-caret-down"></i> Read More</a>
-                            {{else}}
-                              {{{ line_item.item_description }}}
-                              <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, false)"><i class="fa fa-caret-up"></i> Hide</a>
-                            {{/if}}
-                          {{/if}}
-                          <p><sup>*</sup>Prices are exclusive of tax.</p>
-                        </div>
-
-                        <div class="ticket-price-qty clearfix">
-                          {{#if line_item.is_available}}
-                            <div class="add-item-btn">
-                              {{#if line_item.quantity > 0}}
-                                <button class="outreach-button outreach-button-action" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)"><i class="fa fa-heart"></i> Interested</button>
-                              {{else}}
-                                <button class="outreach-button outreach-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)">I am interested</button>
-                              {{/if}}
+                              {{#line_item.item_image.length > 1}}
+                                <a class="left carousel-control" href="#{{line_item.item_name}}-carousel" role="button" data-slide="prev">
+                                  <span class="slider-control fa fa-chevron-left" aria-hidden="true"></span>
+                                  <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="right carousel-control" href="#{{line_item.item_name}}-carousel" role="button" data-slide="next">
+                                  <span class="slider-control fa fa-chevron-right" aria-hidden="true"></span>
+                                  <span class="sr-only">Next</span>
+                                </a>
+                              {{/}}
                             </div>
                           {{else}}
-                            <div class="sold-out-wrapper" intro='fly:{"x":100,"y":0}'>
-                              <p class="sold-out">Sold out</p>
+                            <div class="org-logo">
+                              <img src="{{order.org_logo}}" alt="{{order.org_name}}">
                             </div>
                           {{/if}}
                         </div>
+
+                        <div class="ticket-details">
+                          <p class="ticket-title">{{ line_item.item_title }}</p>
+                          <p class="ticket-price">{{ formatToIndianRupee(line_item.base_price) }}<sup>*</sup></p>
+
+                          <div class="ticket-description">
+                            <div class="blurb">{{{ line_item.item_blurb }}}</div>
+                            {{#if line_item.item_description}}
+                              {{#if !line_item.expand}}
+                                <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, true)"><i class="fa fa-caret-down"></i> Read More</a>
+                              {{else}}
+                                <div class="description">{{{ line_item.item_description }}}</div>
+                                <a href="javascript:void(0)" class="js-read-more" on-click="expandText(event, line_item.item_name, false)"><i class="fa fa-caret-up"></i> Hide</a>
+                              {{/if}}
+                            {{/if}}
+                            <p><sup>*</sup>Prices are exclusive of tax.</p>
+                          </div>
+                        </div>
+
+                        {{#if line_item.is_available}}
+                          <div class="add-item-btn">
+                            {{#if line_item.quantity > 0}}
+                              <button class="outreach-button outreach-button-action" on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, false)"><i class="fa fa-shopping-cart"></i> Added to cart</button>
+                            {{else}}
+                              <button class="outreach-button outreach-button-action " on-click="updateOrder(event, line_item.item_name, line_item.quantity_available, true)"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+                            {{/if}}
+                          </div>
+                        {{else}}
+                          <p class="sold-out" intro='fly:{"x":100,"y":0}'>Sold out</p>
+                        {{/if}}
+
                       </div>
                     <div>
                   {{/if}}
@@ -211,20 +276,156 @@
     border-top-width: 0;
     min-height: 450px;
   }
+  .category-heading {
+    color: #333;
+    position: relative;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    padding: 30px 15px 15px;
+    z-index: 1;
+    text-align: left;
+  }
+  @media (min-width: 768px) {
+    .category-heading {
+      font-size: 35px;
+    }
+  }
+  .category-description {
+    font-size: 18px;
+    text-align: left;
+    margin: 15px 0 0 0;
+    padding: 0 15px;
+    line-height: 1.65em;
+  }
+  .cart-btn-wrapper {
+    position: fixed;
+    bottom: 10px;
+    right: 15px;
+    z-index: 998;
+  }
+  @keyframes bounce {
+    0%, 100% {
+      bottom: 10px;
+    }
+    50% {
+      bottom: 45px;
+    }
+  }
+  .cart-btn-wrapper.bounce {
+    animation-name: bounce;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+  }
+  .cart-btn-wrapper .cart-btn {
+    color: #fff;
+    background-color: #005580;
+    border-color: #00334d;
+    border-width: 0px 0px 3px;
+    border-style: solid;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
+    font-size: 30px;
+    line-height: 1.3;
+    position: relative;
+    z-index: 999;
+    padding: 0 11px 0 9px;
+    margin: 0;
+    height: 53px;
+    border-radius: 5px;
+  }
+  @media (min-width: 768px) {
+    .cart-btn-wrapper {
+      right: 30px;
+    }
+  }
+  .cart-content {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    position: fixed;
+    z-index: 1030;
+    top: 0;
+    bottom: 0;
+    right: -100%;
+    transition: 0.2s ease all;
+    -moz-transition: 0.2s ease all;
+    -webkit-transition: 0.2s ease all;
+  }
+  .cart-open {
+    right: 0;
+  }
+  .cart-body {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 250px;
+    padding: 15px;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.6);
+    bottom: 0px;
+    background-color: #eee;
+    border: 2px solid #ccc;
+    border-width: 0 0 2px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: calc(100% - 130px);
+  }
+  .cart-title {
+    font-size: 30px;
+    text-align: left;
+    line-height: 1;
+  }
+  .close-button {
+    border: 0;
+    box-shadow: none;
+    background-color: transparent;
+    margin-right: 5px;
+    font-size: 25px;
+    padding: 0;
+    position: relative;
+    top: -2px;
+  }
+  .cart-list {
+    padding: 0 0 0 15px;
+  }
+  .item-summary {
+    border-bottom: 1px dotted #CCC;
+    padding: 5px;
+  }
+  .booked-ticket-title {
+    font-size: 16px;
+  }
+  .booked-ticket-title .fa-ticket {
+    padding-right: 10px;
+  }
+  .cart-footer {
+    padding: 0 15px;
+    width: 250px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #eee;
+    height: 130px;
+  }
+  .cart-footer-btn {
+    width: 100%;
+    margin: 0 0 10px;
+  }
+  .price {
+    font-size: 15px;
+    margin: 10px 0;
+  }
+  .price .rupee-sign {
+    font-size: 13px;
+  }
+  .btn-wrapper {
+    text-align: center;
+  }
   .contact-btn {
     margin: 10px 15px;
+    font-size: 20px;
   }
   .contact-btn .fa {
     position: relative;
     top: 1px;
-  }
-  @media (min-width: 768px and max-width: 1200px){
-    .contact-btn {
-      position: absolute;
-      float: none;
-      top: 27px;
-      right: 15px;
-    }
   }
   .categories {
     clear: both;
@@ -246,8 +447,53 @@
   .card {
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
     border-radius: 5px;
-    padding: 15px;
+    padding: 20px;
     min-height: 196px;
+  }
+  .ticket-image-wrapper {
+    margin: 0 0 30px;
+  }
+  .ticket-image {
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    margin: 0;
+    max-height: 270px;
+  }
+  .org-logo {
+    width: 50%;
+    margin: auto;
+  }
+  .ticket-image img,
+  .org-logo img {
+    width: 100%;
+  }
+  .carousel-indicators {
+    margin-bottom: 0;
+    bottom: -25px;
+  }
+  .carousel-indicators li {
+    border: 1px solid #333;
+  }
+  .carousel-indicators .active {
+    background-color: #333;
+  }
+  .carousel-control:active, 
+  .carousel-control:focus {
+    outline: none;
+  }
+  .slider-control {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 5;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    margin-top: -15px;
+    margin-left: -15px;
+    font-size: 20px;
   }
   @media (min-width: 768px) {
     .card-wrapper {
@@ -257,10 +503,20 @@
     .card {
       min-height: 520px
     }
-  }
-  @media (min-width: 1200px) {
-    .card-wrapper {
-      width: 33.3%; 
+    .card-wrapper.featured {
+      width: 80%;
+    }
+    .card-wrapper.featured .card {
+      min-height: 350px;
+    }
+    .featured .ticket-image-wrapper {
+      float: left;
+      width: 50%;
+      padding-right: 30px;
+    }
+    .featured .ticket-details {
+      float: right;
+      width: 50%;
     }
   }
   .ticket-selected {
@@ -277,33 +533,14 @@
       font-weight: 500;
     }
   }
-  .ticket-image {
-    width: 100%;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    overflow: hidden;
-    margin: 15px 0px;
-  }
-  .org-logo {
-    width: 50%;
-    margin: auto;
-  }
-  .ticket-image img,
-  .org-logo img {
-    width: 100%;
-  }
-  .ticket-image-thumbnail,
-  .org-logo-thumbnail {
-    width: 70px;
-    height: auto;
-    border-radius: 5px;
-  }
-  .ticket-image-thumbnail {
-    margin-right: 10px;
-  }
   .ticket-description {
-    font-size: 15px;
-    margin-top: 15px;
+    margin: 15px 0;
+  }
+  .ticket-description .blurb {
+    font-size: 20px;
+  }
+  .ticket-description .description {
+    font-size: 18px;
   }
   .ticket-description p {
     margin: 7px 0 0;
@@ -316,105 +553,28 @@
     padding-right: 5px;
   }
   .js-read-more {
+    font-size: 18px;
     color: #428bca;
     text-decoration: none;
     border: 0;
     margin: 5px 0;
     display: inline-block;
   }
-  .few-ticket {
-    font-size: 13px;
-    font-style: italic;
-    margin: 0 0 5px;
-    text-align: center;
-  }
-  .available-count {
-    color: #e42c42;
-  }
-  .add-item-btn {
-    text-align: center;
-  }
-  .ticket-price-qty {
-    margin-top: 15px;
-    width: 100%;
-  }
-  .price-details-wrapper {
-    margin: 0 auto 10px;
-  }
-  .ticket-price-wrapper {
-    margin-top: 4px;
-    position: relative;
-  }
   .ticket-price {
     font-size: 18px;
     margin: 0;
+    margin: 4px 0 0;
+    position: relative;
   }
   .ticket-price .rupee-sign {
     font-size: 16px;
   }
-  .final-amount{
+  .final-amount {
     float: right;
   }
-  .ticket-qty-wrapper {
-    border: 1px solid #CCC;
-    border-radius: 4px;
-    outline: medium none;
-    color: #333;
-    padding: 0;
-    height: 30px;
-    overflow: hidden;
-    background: #f6f3c2;
-    font-size: 18px;
-    width: 80px;
-    margin: 0 auto;
-  }
-  .ticket-qty {
-    width: 32px;
-    border: 0px none;
-    background: #f6f3c2;
-    -webkit-text-fill-color:#333;
-    color: #333;
-    line-height: 1;
-    display: inline-block;
-    padding-left: 8px;
-    font-size: 18px;
-  }
-  @media (min-width: 768px) {
-    .ticket-price,
-    .ticket-qty {
-      font-size: 20px;
-    }
-    .ticket-price .rupee-sign {
-      font-size: 18px;
-    }
-  }
-  input[type=number]::-webkit-inner-spin-button, 
-  input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  input[type=number] {
-    -moz-appearance: textfield;
-  }
-  .increment, .decrement {
-    line-height: 1;
-    font-size: 20px;
-    background-color: #eee;
-    height: 100%;
-    border: 0;
-    padding: 0 5px;
-  }
-  .increment:focus, .decrement:focus {
-    outline:0;
-  }
-  .multiplier {
-    padding-right: 20px;
-    font-size: 20px;
-    margin-top: 2px;
-    float: right;
-  }
-  .subtotal {
-    margin: 5px 0;
+  .add-item-btn {
+    text-align: center;
+    clear: both;
   }
   .sold-out {
     font-size: 15px;
@@ -427,11 +587,19 @@
     text-align: center;
     box-shadow: 1px 1px 1px rgba(0,0,0,0.3);
     font-weight: bold;
+    clear: both;
+  }
+  @media (min-width: 768px) {
+    .ticket-price {
+      font-size: 20px;
+    }
+    .ticket-price .rupee-sign {
+      font-size: 18px;
+    }
   }
   @media (min-width: 600px) and (max-width: 1023px) {
     .ticket-title,
-    .ticket-price,
-    .multiplier {
+    .ticket-price {
      font-size: 25px;
     }
     .sold-out {
@@ -442,35 +610,6 @@
     .ticket-price .rupee-sign {
       font-size: 22px;
     }
-    .ticket-qty-wrapper {
-      width: 102px;
-    }
-    .increment, .decrement, .ticket-qty {
-      font-size: 35px;
-    }
-    .ticket-qty-wrapper {
-      height: 37px;
-    }
-    .ticket-qty {
-      top: -4px;
-      width: 40px;
-    }
-  }
-  @media (min-width: 1024px) {
-    .ticket-price-wrapper {
-      margin-top: 2px;
-    }
-  }
-  .item-amount {
-    clear: both;
-    font-size: 15px;
-    color: #888;
-    margin: 10px auto 0;
-    text-align: center;
-  }
-  .item-amount .rupee-sign {
-    font-size: 13px;
-    padding-left: 5px;
   }
   .outreach-section .separator {
     height: 1px;
@@ -481,9 +620,6 @@
   .outreach-section .separator.thick {
     border-top: 3px solid #ccc;
     margin: 0 -15px 0;
-  }
-  .cart-list {
-    padding: 0 0 0 15px;
   }
   .ticket-total {
     clear: both;
@@ -533,6 +669,12 @@
     margin: auto;
     max-width: 800px;
     padding: 0 15px;
+  }
+  .buyer-form-title, 
+  .summary {
+    text-align: left;
+    font-size: 20px;
+    margin: 20px 0 30px;
   }
   .buyer-details .group {
     position: relative;
@@ -621,23 +763,14 @@
     top: -13px;
     left: 20px;
   }
-  .buyer-form-title, .summary {
-    text-align: left;
-    font-size: 20px;
-    margin: 20px 0 30px;
+  .ticket-image-thumbnail,
+  .org-logo-thumbnail {
+    width: 70px;
+    height: auto;
+    border-radius: 5px;
   }
-  .checkout-confirmation {
-    padding: 0;
-  }
-  .item-summary {
-    border-bottom: 1px dotted #CCC;
-    padding: 5px;
-  }
-  .booked-ticket-title {
-    font-size: 16px;
-  }
-  .booked-ticket-title .fa-ticket {
-    padding-right: 10px;
+  .ticket-image-thumbnail {
+    margin-right: 10px;
   }
   .booked-ticket-qty{
     font-size: 13px;
@@ -646,13 +779,6 @@
   }
   .booked-ticket-qty .rupee-sign {
     font-size: 11px;
-  }
-  .price {
-    font-size: 15px;
-    margin: 10px 0;
-  }
-  .price .rupee-sign {
-    font-size: 13px;
   }
   .proceed-button-wrapper {
     margin: 10px 0;
@@ -693,9 +819,5 @@
       max-width: 800px;
       margin: auto;
     }
-  }
-  .name {
-    text-align: left;
-    margin: 0;
   }
 </style>

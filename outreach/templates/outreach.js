@@ -230,7 +230,7 @@ $(function() {
         scrollTop: function(){
           //Scroll the page up to top of outreach widget.
           $('html,body').animate({
-            scrollTop: $("#" + outreach.ractive.el.id).offset().top
+            scrollTop: $("#" + outreach.ractive.el.id).offset().top - 50
           }, '300');
         },
         selectItems: function(event) {
@@ -253,10 +253,33 @@ $(function() {
           });
           outreach.ractive.set('order.line_items', lineItems);
         },
-        isCartEmpty: function(){
+        isCartEmpty: function() {
           return outreach.ractive.get('order.line_items').filter(function(line_item){
             return line_item.quantity > 0;
           }).length === 0;
+        },
+        animateCartBtn: function() {
+          var cart_btn = document.getElementsByClassName('cart-btn-wrapper')[0];
+          cart_btn.classList.add('bounce');
+          window.setTimeout(function() {
+            cart_btn.classList.remove('bounce');
+          }, 4000);
+        },
+        openCart: function(event, action) {
+          //Slide open or close cart
+          event.original.preventDefault();
+          outreach.ractive.set('cartSideBarOpen', action);
+          var body;
+          if(action) {
+            body = document.getElementsByTagName('body')[0];
+            body.style.overflow = 'hidden';
+            outreach.ractive.scrollTop();
+            outreach.ractive.fire('eventAnalytics', 'open cart', 'openCart');
+          }
+          else {
+            body = document.getElementsByTagName('body')[0];
+            body.style.overflow = '';
+          }
         },
         updateOrder: function(event, item_name, quantityAvailable, increment) {
           // Increments or decrements a line item's quantity
@@ -290,6 +313,7 @@ $(function() {
           }
           else {
             outreach.ractive.set('order.is_cart_empty', false);
+            outreach.ractive.animateCartBtn();
           }
         },
         calculateOrder: function() {
@@ -390,6 +414,7 @@ $(function() {
         getContactDetails: function(event) {
           // Transitions the widget to the Contact Details form
           event.original.preventDefault();
+          outreach.ractive.openCart(event, false);
           outreach.ractive.set({
             'tabs.contact.errorMsg': '',
             'order.status': outreach.orderStatus.Inquiry,
@@ -529,9 +554,6 @@ $(function() {
           outreach.ractive.fire('eventAnalytics', 'confirmation', 'confirmContactDetails');
         },
         oncomplete: function() {
-          //Start bootstrap carousel
-          $('.carousel').carousel();
-
           outreach.ractive.on('eventAnalytics', function(userAction, label) {
             if (typeof outreach.ractive.get('sendEventHits') === "undefined") {
               outreach.ractive.set('sendEventHits', 0);
