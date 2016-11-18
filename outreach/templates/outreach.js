@@ -554,6 +554,14 @@ $(function() {
           outreach.ractive.fire('eventAnalytics', 'confirmation', 'confirmContactDetails');
         },
         oncomplete: function() {
+          //To support swipe events, jquery mobile is required
+          $(".js-swipe-slider").swiperight(function() {
+            $(this).carousel('prev');
+          });
+          $(".js-swipe-slider").swipeleft(function() {
+            $(this).carousel('next');
+          });
+
           outreach.ractive.on('eventAnalytics', function(userAction, label) {
             if (typeof outreach.ractive.get('sendEventHits') === "undefined") {
               outreach.ractive.set('sendEventHits', 0);

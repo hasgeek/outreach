@@ -63,7 +63,7 @@
 
                         <div class="ticket-image-wrapper">
                           {{#if line_item.item_image}}
-                            <div id="{{line_item.item_name}}-carousel" class="carousel slide" data-ride="carousel" data-interval="false">
+                            <div id="{{line_item.item_name}}-carousel" class="carousel slide js-swipe-slider" data-ride="carousel" data-interval="false">
                               {{#line_item.item_image.length > 1}}
                                 <ol class="carousel-indicators">
                                   {{#line_item.item_image:index}}
@@ -165,7 +165,7 @@
         <form role="form" name="buyer-form" class="buyer-details">
           <p class="buyer-form-title">Contact details</p>
           <div class="group">
-            <input class="group-input {{#buyer.name}}filled{{/}}" type="text" name="name" value="{{buyer.name}}" autofocus>
+            <input class="group-input {{#buyer.name}}filled{{/}}" type="text" name="name" value="{{buyer.name}}">
             <span class="bar"></span>
             <label class="group-label">Name</label>
             {{#errormsg.name}}<p class="form-error-msg">{{ errormsg.name }}</p>{{/}}
@@ -469,18 +469,18 @@
   .org-logo img {
     width: 100%;
   }
-  .carousel-indicators {
+  .ticket-image-wrapper .carousel-indicators {
     margin-bottom: 0;
     bottom: -25px;
   }
-  .carousel-indicators li {
+  .ticket-image-wrapper .carousel-indicators li {
     border: 1px solid #333;
   }
-  .carousel-indicators .active {
+  .ticket-image-wrapper .carousel-indicators .active {
     background-color: #333;
   }
-  .carousel-control:active, 
-  .carousel-control:focus {
+  .ticket-image-wrapper .carousel-control:active,
+  .ticket-image-wrapper .carousel-control:focus {
     outline: none;
   }
   .slider-control {
