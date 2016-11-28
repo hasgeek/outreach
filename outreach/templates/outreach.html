@@ -6,7 +6,7 @@
 
        {{#if !order.is_cart_empty}}
         <div class="cart-btn-wrapper">
-          <button class="cart-btn" on-click="openCart(event, true)">
+          <button class="cart-btn" on-click="openCart(event, true)" aria-label="Cart">
             <i class="fa fa-shopping-cart"></i>
           </button>
         </div>
@@ -137,6 +137,7 @@
         </div>
 
         <div class="btn-wrapper">
+          <p class="continue-text">Like to know more?</p>
           <button class="outreach-button outreach-button-action contact-btn" on-click="getContactDetails(event)">
             {{#if !order.is_cart_empty}}
               <span>Continue <i class="fa fa-arrow-right"></i></span>
@@ -165,7 +166,7 @@
         <form role="form" name="buyer-form" class="buyer-details">
           <p class="buyer-form-title">Contact details</p>
           <div class="group">
-            <input class="group-input {{#buyer.name}}filled{{/}}" type="text" name="name" value="{{buyer.name}}">
+            <input class="group-input {{#buyer.name}}filled{{/}}" type="text" name="name" value="{{buyer.name}}" autofocus>
             <span class="bar"></span>
             <label class="group-label">Name</label>
             {{#errormsg.name}}<p class="form-error-msg">{{ errormsg.name }}</p>{{/}}
@@ -209,6 +210,7 @@
               </ol>
               <p class="price">Total <span class="final-amount"><b> {{ formatToIndianRupee(order.final_amount) }}</b></span></p>
               <hr class="separator">
+              <p class="callme-text">We will contact you within 24 hours to take this forward.</p>
             </div>
           {{/if}}
 
@@ -230,7 +232,7 @@
         <p class="confirmation-icon"><i class="fa fa-thumbs-up"></i></p>
         <p class="confirmation-header">Thank you for your interest!</p>
         <div class="confirmation-msg">
-          <p>We will contact you within the next 24 hours by phone or email.</p>
+          <p>We will contact you within 24 hours by phone or email.</p>
         </div>
       </div>      
     {{/if}}
@@ -291,12 +293,21 @@
       font-size: 35px;
     }
   }
-  .category-description {
+  .category-description,
+  .continue-text,
+  .callme-text {
     font-size: 18px;
     text-align: left;
     margin: 15px 0 0 0;
     padding: 0 15px;
     line-height: 1.65em;
+  }
+  .continue-text {
+    text-align: center;
+  }
+  .callme-text {
+    text-align: right;
+    padding: 0;
   }
   .cart-btn-wrapper {
     position: fixed;
