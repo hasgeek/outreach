@@ -65,9 +65,7 @@ def calculate():
 @xhr_only
 @cors
 def create_order_inquiry(item_collection):
-    buyer_form = BuyerForm.from_json(request.json.get('buyer'))
-    # See comment in BuyerForm about CSRF
-    buyer_form.csrf_enabled = False
+    buyer_form = BuyerForm.from_json(request.json.get('buyer'), meta={'csrf': False})
     if not buyer_form.validate():
         return make_response(jsonify(message='Invalid buyer details'), 400)
 
@@ -99,8 +97,7 @@ def create_order_inquiry(item_collection):
 
     db.session.add(order)
     if request.json.get('order_session'):
-        order_session_form = OrderSessionForm.from_json(request.json.get('order_session'))
-        order_session_form.csrf_enabled = False
+        order_session_form = OrderSessionForm.from_json(request.json.get('order_session'), meta={'csrf': False})
         if order_session_form.validate():
             order_session = OrderSession(order=order)
             order_session_form.populate_obj(order_session)
