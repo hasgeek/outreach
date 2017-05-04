@@ -2,6 +2,7 @@
 
 from pytz import timezone
 from flask import Flask
+from flask_migrate import Migrate
 from flask_rq import RQ
 from flask_mail import Mail
 from flask_lastuser import Lastuser
@@ -51,7 +52,7 @@ def init_flask_admin():
 coaster.app.init_app(app)
 db.init_app(app)
 db.app = app
-
+migrate = Migrate(app, db)
 RQ(app)
 
 lastuser.init_app(app)
