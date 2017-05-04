@@ -1,63 +1,16 @@
 #!/usr/bin/env python
 
-from flask_script import Manager, Server, Option, prompt_bool
-from flask_script.commands import Clean, ShowUrls
-from flask_alembic import ManageMigrations
+from coaster.manage import init_manager
 
-from outreach import app, init_for
-from outreach import models
+import outreach
+import outreach.models as models
+import outreach.views as views
 from outreach.models import db
+from outreach import app
 
 
-manager = Manager(app)
-database = Manager(usage="Perform database operations")
+if __name__ == '__main__':
+    db.init_app(app)
+    manager = init_manager(app, db, outreach=outreach, models=models, views=views)
 
-
-class InitedServer(Server):
-    def get_options(self):
-        return super(InitedServer, self).get_options() + (
-        Option('-e', dest='env', default='dev', help="run server for this environment [default 'dev']"),
-        )
-
-    def handle(self, *args, **kwargs):
-        if 'env' in kwargs:
-            init_for(kwargs.pop('env'))
-        super(InitedServer, self).handle(*args, **kwargs)
-
-
-class InitedMigrations(ManageMigrations):
-    def run(self, args):
-        if len(args) and not args[0].startswith('-'):
-            init_for(args[0])
-        super(InitedMigrations, self).run(args[1:])
-
-
-@manager.shell
-def _make_context():
-    return dict(app=app, db=db, models=models, init_for=init_for)
-
-
-@database.option('-e', '--env', default='dev', help="runtime environment [default 'dev']")
-def drop(env):
-    "Drops database tables"
-    init_for(env)
-    if prompt_bool("Are you sure you want to lose all your data?"):
-        db.drop_all()
-
-
-@database.option('-e', '--env', default='dev', help="runtime environment [default 'dev']")
-def create(env):
-    "Creates database tables from sqlalchemy models"
-    init_for(env)
-    db.create_all()
-
-
-manager.add_command("db", database)
-manager.add_command("runserver", InitedServer())
-manager.add_command("clean", Clean())
-manager.add_command("showurls", ShowUrls())
-manager.add_command("migrate", InitedMigrations())
-
-
-if __name__ == "__main__":
     manager.run()
