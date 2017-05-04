@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rqworker -c rqdev outreach 
+rqworker -c rqinit outreach 
