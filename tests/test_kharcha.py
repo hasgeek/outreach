@@ -1,7 +1,7 @@
 import json
 import unittest
 from flask import url_for
-from outreach import app, init_for
+from outreach import app
 from outreach.models import (db, SaleItem)
 from fixtures import init_data
 
@@ -11,7 +11,6 @@ class TestKharchaAPI(unittest.TestCase):
     def setUp(self):
         self.ctx = app.test_request_context()
         self.ctx.push()
-        init_for('test')
         db.drop_all()
         db.create_all()
         init_data()

@@ -1,6 +1,6 @@
 import unittest
 import json
-from outreach import app, init_for
+from outreach import app
 from outreach.models import *
 from fixtures import init_data
 
@@ -10,7 +10,6 @@ class TestOrder(unittest.TestCase):
     def setUp(self):
         self.ctx = app.test_request_context()
         self.ctx.push()
-        init_for('test')
         db.create_all()
         init_data()
         self.client = app.test_client()
