@@ -16,3 +16,4 @@ html2text
 premailer
 python-dateutil
 Flask-Admin
+Flask-Migrate
