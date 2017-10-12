@@ -62,4 +62,4 @@ def item_collection(item_collection):
         category_json = jsonify_category(category)
         if category_json:
             categories_json.append(category_json)
-    return jsonify(html=render_template('outreach.html'), categories=categories_json, refund_policy=item_collection.details.get('refund_policy', ''))
+    return jsonify(html=render_template('outreach.html.jinja2'), categories=categories_json, refund_policy=item_collection.details.get('refund_policy', ''))

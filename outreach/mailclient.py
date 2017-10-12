@@ -15,7 +15,7 @@ def send_confirmation_mail(order_id, subject="Thank you for your order!"):
     with app.test_request_context():
         order = Order.query.get(order_id)
         msg = Message(subject=subject, recipients=[order.buyer_email], bcc=[order.organization.contact_email])
-        html = email_transform(render_template('order_confirmation_mail.html', order=order, org=order.organization, line_items=order.line_items, base_url=app.config['BASE_URL']))
+        html = email_transform(render_template('order_confirmation_mail.html.jinja2', order=order, org=order.organization, line_items=order.line_items, base_url=app.config['BASE_URL']))
         msg.html = html
         msg.body = html2text(html)
         mail.send(msg)
