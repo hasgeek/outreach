@@ -53,7 +53,7 @@ class SaleItem(BaseScopedNameMixin, db.Model):
     def price_at(self, timestamp):
         """Return the price object for an item at a given time."""
         return Price.query.filter(Price.sale_item == self, Price.start_at <= timestamp,
-            Price.end_at > timestamp).order_by('created_at desc').first()
+            Price.end_at > timestamp).order_by(Price.created_at.desc()).first()
 
     def is_available(self):
         """Checks if an item has a current price object and has a positive quantity_available"""
