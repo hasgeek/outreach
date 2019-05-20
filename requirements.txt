@@ -16,4 +16,4 @@ html2text==2018.1.9
 premailer==3.4.1
 python-dateutil==2.8.0
 Flask-Admin==1.5.3
-Flask-Migrate==2.4.0
+Flask-Migrate==2.5.0
