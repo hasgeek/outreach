@@ -1,5 +1,5 @@
 Flask==1.1.1
-Flask-SQLAlchemy==2.4.0
+Flask-SQLAlchemy==2.4.1
 Flask-Assets==0.12
 Flask-Mail==0.9.1
 Flask-WTF==0.14.2
@@ -12,8 +12,8 @@ pytz==2019.2
 psycopg2==2.8.3
 wtforms_json==0.3.3
 rq==1.1.0
-html2text==2018.1.9
-premailer==3.5.0
+html2text==2019.9.26
+premailer==3.6.1
 python-dateutil==2.8.0
 Flask-Admin==1.5.3
 Flask-Migrate==2.5.2
